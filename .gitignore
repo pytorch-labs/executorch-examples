@@ -1,0 +1,12 @@
+# System files
+.DS_Store
+
+# Any exported models and profiling outputs
+*.bin
+*.model
+*.pte
+
+# Xcode
+xcuserdata/
+.swiftpm/
+*.xcworkspace/
