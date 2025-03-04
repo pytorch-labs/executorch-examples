@@ -41,8 +41,8 @@ Now, let's move on to exporting and bundling the MobileNet v3 model.
 Clone ExecuTorch and configure the basic environment:
 
 ```bash
-git clone https://github.com/pytorch/executorch.git --depth 1 && cd executorch \
-python3 -m venv .venv && source .venv/bin/activate && pip3 install --upgrade pip && cd - \
+git clone https://github.com/pytorch/executorch.git --depth 1 && cd executorch && \
+python3 -m venv .venv && source .venv/bin/activate && pip3 install --upgrade pip && cd - && \
 ./executorch/install_executorch.sh
 ```
 
@@ -51,7 +51,7 @@ python3 -m venv .venv && source .venv/bin/activate && pip3 install --upgrade pip
 Install additional dependencies for Core ML and MPS backends:
 
 ```bash
-./executorch/backends/apple/coreml/scripts/install_requirements.sh
+./executorch/backends/apple/coreml/scripts/install_requirements.sh && \
 ./executorch/backends/apple/mps/install_requirements.sh
 ```
 
@@ -72,7 +72,7 @@ cd -
 Move the exported model files (those with `.pte` extension) to a specific location where the Demo App will pick them up:
 
 ```bash
-mkdir -p apple/ExecuTorchDemo/ExecuTorchDemo/Resources/Models/MobileNet/
+mkdir -p apple/ExecuTorchDemo/ExecuTorchDemo/Resources/Models/MobileNet/ && \
 mv executorch/"$MODEL_NAME"*.pte apple/ExecuTorchDemo/ExecuTorchDemo/Resources/Models/MobileNet/
 ```
 
@@ -99,11 +99,11 @@ open apple/ExecuTorchDemo/ExecuTorchDemo.xcodeproj
 You can run tests on Simulaltor directly in Xcode with `Cmd + U` or use the command line:
 
 ```bash
-xcrun simctl create executorch "iPhone 15"
+xcrun simctl create executorch "iPhone 15" && \
 xcodebuild clean test \
      -project apple/ExecuTorchDemo/ExecuTorchDemo.xcodeproj \
      -scheme App \
-     -destination name=executorch
+     -destination name=executorch && \
 xcrun simctl delete executorch
 ```
 
