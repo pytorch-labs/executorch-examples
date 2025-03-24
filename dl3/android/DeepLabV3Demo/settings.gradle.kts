@@ -22,6 +22,6 @@ dependencyResolutionManagement {
   }
 }
 
-rootProject.name = "ExecuTorchDemo"
+rootProject.name = "DeepLabV3Demo"
 
 include(":app")
