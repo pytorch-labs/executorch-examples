@@ -6,12 +6,14 @@
 # LICENSE file in the root directory of this source tree.
 
 import torch
-from executorch.extension.pybindings.portable_lib import _load_for_executorch
+from executorch.runtime import Runtime
 
 
 def main() -> None:
-    model = _load_for_executorch("dl3_xnnpack_fp32.pte")
-    result = model.forward((torch.randn(1, 3, 224, 224), ))
+    runtime = Runtime.get()
+    program = runtime.load_program("dl3_xnnpack_fp32.pte")
+    method = program.load_method("forward")
+    result = method.execute((torch.randn(1, 3, 224, 224), ))
     # TODO: Load an image and show the output
     print(result)
 
