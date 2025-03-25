@@ -6,23 +6,34 @@ This guide explains how to setup ExecuTorch for Android using a demo app. The ap
 * Download and install [Android Studio and SDK 34](https://developer.android.com/studio).
 * (For exporting the DL3 model) Python 3.10+ with `executorch` package installed.
 
-## Exporting the model
+## Step 1: Export the model
 Run the script in `dl3/python/export.py` to export the model.
 
-## Push the model to the phone
+## Step 2: Push the model to the phone
 The app loads a hardcoded model path (`/data/local/tmp/dl3_xnnpack_fp32.pte`) on the phone.
 Run the following adb command to push the model.
 ```
 adb push dl3_xnnpack_fp32.pte /data/local/tmp/dl3_xnnpack_fp32.pte
 ```
 
-## Build and install to your phone
-(`cd dl3/android/DeepLanV3Demo` first)
+## Step 3: Build, install, and run the app on your phone
+### On your terminal
+(`cd dl3/android/DeepLabV3Demo` first)
 ```
 ./gradlew installDebug
+adb shell am start -W -S -n org.pytorch.executorchexamples.dl3/.MainActivity
 ```
 
-## Run unit test
+### On Android Studio
+Open Android Studio and open the project path `dl3/android/DeepLanV3Demo`. Wait for gradle sync to complete.
+Then simply press "Run app" button (Control + r).
+
+## Step 4: Run unit test
+### On your terminal
 ```
 ./gradlew connectedAndroidTest
 ```
+
+### On Android Studio
+In Android Studio project, open file `app/src/androidTest/java/org/pytorch/executorchexamples/dl3/SanityCheck.java`,
+and click the "Play" button for `public class SanityCheck` (Control + Shift + r).
