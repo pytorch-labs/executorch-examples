@@ -12,11 +12,11 @@ plugins {
 }
 
 android {
-  namespace = "com.example.executorchdemo"
+  namespace = "org.pytorch.executorchexamples.dl3"
   compileSdk = 34
 
   defaultConfig {
-    applicationId = "com.example.executorchdemo"
+    applicationId = "org.pytorch.executorchexamples.dl3"
     minSdk = 24
     targetSdk = 34
     versionCode = 1

@@ -6,7 +6,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-package com.example.executorchdemo;
+package org.pytorch.executorchexamples.dl3;
 
 import android.app.Activity;
 import android.content.Context;
