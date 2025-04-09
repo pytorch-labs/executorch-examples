@@ -1,6 +1,6 @@
-# ExecutorTorch MobileNetV2 Demo C++ Application
+# ExecuTorch MobileNetV2 Demo C++ Application
 
-This is a simple C++ demo application that uses the ExecutorTorch library for MobileNetV2 model inference.
+This is a simple C++ demo application that uses the ExecuTorch library for MobileNetV2 model inference.
 
 ## Build instructions
 
@@ -36,9 +36,9 @@ This is a simple C++ demo application that uses the ExecutorTorch library for Mo
 
 - CMake 3.18 or higher
 - C++17 compatible compiler
-- ExecutorTorch library (release/0.6)
+- ExecuTorch library (release/0.6)
 
 ## Notes
 
-- Make sure you have the correct model file (`.pte`) compatible with ExecutorTorch.
+- Make sure you have the correct model file (`.pte`) compatible with ExecuTorch.
 - This demo currently initializes the input tensor with random data. In a real application, you would replace this with actual input data.
