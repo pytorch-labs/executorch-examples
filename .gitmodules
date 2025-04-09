@@ -1,0 +1,4 @@
+[submodule "mv2/cpp/executorch"]
+	path = mv2/cpp/executorch
+	url = https://github.com/pytorch/executorch.git
+	branch = release/0.6

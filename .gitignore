@@ -10,3 +10,7 @@
 xcuserdata/
 .swiftpm/
 *.xcworkspace/
+
+# MV2
+mv2/cpp/build
+
