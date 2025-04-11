@@ -6,7 +6,7 @@ This is a simple C++ demo application that uses the ExecuTorch library for Mobil
 
 0. Export the model. See [mv2/python/README.md](../python/README.md)
 
-1. The ExecuTorch repository is already configured as a git submodule at `~/executorch-examples/cpp/executorch/`. To initialize it:
+1. The ExecuTorch repository is already configured as a git submodule at `~/executorch-examples/mv2/cpp/executorch/`. To initialize it:
    ```bash
     cd ~/executorch-examples/
     git submodule sync
