@@ -1,6 +1,9 @@
 # System files
 .DS_Store
 
+# Build and tool-generated files
+build/
+
 # Any exported models and profiling outputs
 *.bin
 *.model
@@ -8,9 +11,7 @@
 
 # Xcode
 xcuserdata/
+.build/
 .swiftpm/
 *.xcworkspace/
-
-# MV2
-mv2/cpp/build
-
+*.xcframework/
