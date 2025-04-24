@@ -48,27 +48,14 @@ The steps to add the necessary package dependency are available in the
 
 ### 4. Set Up ExecuTorch
 
-Clone ExecuTorch and set up the environment as explained in the [Building from Source tutorial](https://pytorch.org/executorch/main/using-executorch-building-from-source.html):
-
 ```bash
-git clone -b viable/strict https://github.com/pytorch/executorch.git && cd executorch
-
-python3 -m venv .venv && source .venv/bin/activate && pip install --upgrade pip
-
-./install_executorch.sh
+pip install executorch
 ```
 
-### 5. Backend Dependencies
+Alternatively, clone ExecuTorch and set up the environment as explained in the [Building from Source tutorial](https://pytorch.org/executorch/main/using-executorch-building-from-source.html):
 
-Install additional dependencies for [Core ML](https://pytorch.org/executorch/main/backends-coreml.html) and [MPS](https://pytorch.org/executorch/main/backends-mps.html) backends:
 
-```bash
-./backends/apple/coreml/scripts/install_requirements.sh
-
-./backends/apple/mps/install_requirements.sh
-```
-
-### 6. Clone the Demo App
+### 5. Clone the Demo App
 
 ```bash
 git clone --depth 1 https://github.com/pytorch-labs/executorch-examples.git
@@ -80,21 +67,19 @@ Now, let's move on to exporting and bundling the MobileNet v3 model.
 
 ### 1. Export Model
 
-Export the MobileNet v3 model using the command line and move the exported model to
-a specific location where the Demo App will pick them up:
+Export the MobileNet v3 model using the command line with Core ML, MPS and XNNPACK backends
 
 ```bash
-python3 -m examples.portable.scripts.export --model_name="mv3"
-
-APP_PATH="executorch-examples/mv3/apple/ExecuTorchDemo/ExecuTorchDemo"
-mkdir -p "$APP_PATH/Resources/Models/MobileNet/"
-mv mv3.pte "$APP_PATH/Resources/Models/MobileNet/"
+cd ~/executorch-examples
+python3 mv3/python/export.py
 ```
 
-Next, export the MobileNet v3 model with Core ML, MPS and XNNPACK backends by runnning this [`export.py`](https://github.com/pytorch-labs/executorch-examples/mv3/apple/ExecuTorchDemo/export.py) script.
+Move the exported model to a specific location where the Demo App will pick them up:
 
-```bash
-python3 export.py
+```
+cd ~/executorch-examples
+mkdir -p mv3/apple/ExecuTorchDemo/ExecuTorchDemo/Resources/Models/MobileNet/
+mv *.pte mv3/apple/ExecuTorchDemo/ExecuTorchDemo/Resources/Models/MobileNet/
 ```
 
 
@@ -104,7 +89,7 @@ Download the MobileNet model labels required for image classification:
 
 ```bash
 curl https://raw.githubusercontent.com/pytorch/hub/master/imagenet_classes.txt \
-  -o "$APP_PATH/Resources/Models/MobileNet/imagenet_classes.txt"
+  -o mv3/apple/ExecuTorchDemo/ExecuTorchDemo/Resources/Models/MobileNet/imagenet_classes.txt
 ```
 
 ## Final Steps
@@ -118,7 +103,7 @@ Double-click on the project file under
 `executorch-examples/mv3/apple/ExecuTorchDemo/ExecuTorchDemo` to openit with Xcode, or run the command:
 
 ```bash
-open $APP_PATH.xcodeproj
+open mv3/apple/ExecuTorchDemo/ExecuTorchDemo.xcodeproj
 ```
 
 ### 2. Run Tests
