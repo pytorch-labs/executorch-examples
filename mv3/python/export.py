@@ -10,7 +10,7 @@ import torchvision.models as models
 from executorch.backends.apple.coreml.partition import CoreMLPartitioner
 from executorch.exir import to_edge 
 from executorch.backends.xnnpack.partition.xnnpack_partitioner import XnnpackPartitioner
-from executorch.exir import to_edge_transform_and_lower
+from executorch.exir import EdgeCompileConfig, to_edge_transform_and_lower
 
 
 def main() -> None:
@@ -24,9 +24,9 @@ def main() -> None:
     et_program_coreml = to_edge_transform_and_lower(
         torch.export.export(model, sample_inputs),
         partitioner=[CoreMLPartitioner()],
+        compile_config=EdgeCompileConfig(_skip_dim_order=True),
     ).to_executorch()
 
-    
     # MPS backend doesn't work yet with pip install today.
     # Currently, it is just falling back to portable ops instead.
     # 
