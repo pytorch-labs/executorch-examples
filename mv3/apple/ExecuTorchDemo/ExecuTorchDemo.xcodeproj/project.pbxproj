@@ -12,7 +12,6 @@
 		032C01A72AC22B16002955E1 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 032C018D2AC22B16002955E1 /* ContentView.swift */; };
 		032C01B72AC329B6002955E1 /* CustomViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 032C01B62AC329B6002955E1 /* CustomViews.swift */; };
 		032C01B92AC32ADF002955E1 /* CameraController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 032C01B82AC32ADF002955E1 /* CameraController.swift */; };
-		032C01E82AC34B60002955E1 /* MobileNetClassifier.mm in Sources */ = {isa = PBXBuildFile; fileRef = 032C01902AC22B16002955E1 /* MobileNetClassifier.mm */; };
 		032C01EC2AC34CAC002955E1 /* libMobileNetClassifier.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 032C01CB2AC34632002955E1 /* libMobileNetClassifier.a */; platformFilter = ios; };
 		032C02032AC47CFB002955E1 /* mv3_xnnpack_fp32.pte in Resources */ = {isa = PBXBuildFile; fileRef = 032C01FC2AC47CFB002955E1 /* mv3_xnnpack_fp32.pte */; };
 		032C02082AC47CFB002955E1 /* imagenet_classes.txt in Resources */ = {isa = PBXBuildFile; fileRef = 032C02012AC47CFB002955E1 /* imagenet_classes.txt */; };
@@ -95,9 +94,6 @@
 		032C018A2AC22B16002955E1 /* MobileNetClassifier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MobileNetClassifier.swift; sourceTree = "<group>"; };
 		032C018B2AC22B16002955E1 /* App.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		032C018D2AC22B16002955E1 /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		032C018E2AC22B16002955E1 /* MobileNet-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MobileNet-Bridging-Header.h"; sourceTree = "<group>"; };
-		032C01902AC22B16002955E1 /* MobileNetClassifier.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MobileNetClassifier.mm; sourceTree = "<group>"; };
-		032C01912AC22B16002955E1 /* MobileNetClassifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MobileNetClassifier.h; sourceTree = "<group>"; };
 		032C01B62AC329B6002955E1 /* CustomViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomViews.swift; sourceTree = "<group>"; };
 		032C01B82AC32ADF002955E1 /* CameraController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraController.swift; sourceTree = "<group>"; };
 		032C01CB2AC34632002955E1 /* libMobileNetClassifier.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMobileNetClassifier.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -216,9 +212,6 @@
 			children = (
 				03C818132AC6707F0084CC29 /* Test */,
 				032C018A2AC22B16002955E1 /* MobileNetClassifier.swift */,
-				032C018E2AC22B16002955E1 /* MobileNet-Bridging-Header.h */,
-				032C01912AC22B16002955E1 /* MobileNetClassifier.h */,
-				032C01902AC22B16002955E1 /* MobileNetClassifier.mm */,
 			);
 			path = MobileNet;
 			sourceTree = "<group>";
@@ -463,7 +456,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				03C818252AC75E580084CC29 /* MobileNetClassifier.swift in Sources */,
-				032C01E82AC34B60002955E1 /* MobileNetClassifier.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -691,7 +683,6 @@
 			buildSettings = {
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "ExecuTorchDemo/Sources/MobileNet/MobileNet-Bridging-Header.h";
 			};
 			name = Debug;
 		};
@@ -700,7 +691,6 @@
 			buildSettings = {
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "ExecuTorchDemo/Sources/MobileNet/MobileNet-Bridging-Header.h";
 			};
 			name = Release;
 		};
@@ -806,7 +796,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/pytorch/executorch";
 			requirement = {
-				branch = "swiftpm-0.6.0";
+				branch = "swiftpm-0.7.0.20250523";
 				kind = branch;
 			};
 		};
