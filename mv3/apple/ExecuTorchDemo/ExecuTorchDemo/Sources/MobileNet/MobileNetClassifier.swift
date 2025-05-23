@@ -13,14 +13,11 @@ import UIKit
 import os.log
 
 public enum MobileNetClassifierError: Error {
-  case inference
   case rawData
   case transform
 
   var localizedDescription: String {
     switch self {
-    case .inference:
-      return "Cannot recognize the image"
     case .rawData:
       return "Cannot get the pixel data from the image"
     case .transform:
@@ -62,9 +59,9 @@ public class MobileNetClassifier: ImageClassification {
     let input = try normalize(rawData(from: transformed(image))).withUnsafeBytes {
       Tensor(bytes: $0.baseAddress!, shape: [1, 3, 224, 224], dataType: .float)
     }
-    guard let output = try module.forward(input).first?.tensor?.withUnsafeBytes([Float].init)
-    else {
-      throw MobileNetClassifierError.inference
+    var output: [Float] = []
+    try module.forward(input).first?.tensor?.bytes { pointer, count, _ in
+      output = Array(UnsafeBufferPointer(start: pointer.assumingMemoryBound(to: Float.self), count: count))
     }
     return softmax(output)
       .enumerated()
