@@ -13,14 +13,14 @@ import UIKit
 import os.log
 
 public enum MobileNetClassifierError: Error {
-  case inputPointer
+  case inference
   case rawData
   case transform
 
   var localizedDescription: String {
     switch self {
-    case .inputPointer:
-      return "Cannot get the input pointer base address"
+    case .inference:
+      return "Cannot recognize the image"
     case .rawData:
       return "Cannot get the pixel data from the image"
     case .transform:
@@ -35,7 +35,7 @@ public class MobileNetClassifier: ImageClassification {
   private static let resizeSize: CGFloat = 256
   private static let cropSize: CGFloat = 224
 
-  private var mobileNetClassifier: ETMobileNetClassifier
+  private var module: Module
   private var labels: [String] = []
   private var rawDataBuffer: [UInt8]
   private var normalizedBuffer: [Float]
@@ -43,7 +43,7 @@ public class MobileNetClassifier: ImageClassification {
   public init?(modelFilePath: String, labelsFilePath: String) throws {
     labels = try String(contentsOfFile: labelsFilePath, encoding: .utf8)
       .components(separatedBy: .newlines)
-    mobileNetClassifier = ETMobileNetClassifier(filePath: modelFilePath)
+    module = Module(filePath: modelFilePath)
     rawDataBuffer = [UInt8](repeating: 0, count: Int(Self.cropSize * Self.cropSize) * 4)
     normalizedBuffer = [Float](repeating: 0, count: rawDataBuffer.count / 4 * 3)
 
@@ -59,22 +59,18 @@ public class MobileNetClassifier: ImageClassification {
   }
 
   public func classify(image: UIImage) throws -> [Classification] {
-    var input = try normalize(rawData(from: transformed(image)))
-    var output = [Float](repeating: 0, count: labels.count)
-
-    try input.withUnsafeMutableBufferPointer { inputPointer in
-      guard let inputPointerBaseAddress = inputPointer.baseAddress else {
-        throw MobileNetClassifierError.inputPointer
-      }
-      try mobileNetClassifier.classify(
-        withInput: inputPointerBaseAddress,
-        output: &output,
-        outputSize: labels.count)
+    let input = try normalize(rawData(from: transformed(image))).withUnsafeBytes {
+      Tensor(bytes: $0.baseAddress!, shape: [1, 3, 224, 224], dataType: .float)
     }
-    return softmax(output).enumerated().sorted(by: { $0.element > $1.element })
-      .compactMap { (index, probability) -> Classification? in
-        guard index < labels.count else { return nil }
-        return Classification(label: labels[index], confidence: probability)
+    guard let output = try module.forward(input).first?.tensor?.withUnsafeBytes([Float].init)
+    else {
+      throw MobileNetClassifierError.inference
+    }
+    return softmax(output)
+      .enumerated()
+      .sorted(by: { $0.element > $1.element })
+      .compactMap { index, probability in
+        index < labels.count ? Classification(label: labels[index], confidence: probability) : nil
       }
   }
 
