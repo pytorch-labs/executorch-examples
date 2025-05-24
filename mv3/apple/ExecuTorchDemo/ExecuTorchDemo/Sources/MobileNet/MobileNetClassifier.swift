@@ -60,7 +60,7 @@ public class MobileNetClassifier: ImageClassification {
       Tensor(bytes: $0.baseAddress!, shape: [1, 3, 224, 224], dataType: .float)
     }
     var output: [Float] = []
-    try module.forward(input).first?.tensor?.bytes { pointer, count, _ in
+    try module.forward(input)[0].tensor?.bytes { pointer, count, _ in
       output = Array(UnsafeBufferPointer(start: pointer.assumingMemoryBound(to: Float.self), count: count))
     }
     return softmax(output)

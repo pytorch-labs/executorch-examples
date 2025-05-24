@@ -12,9 +12,18 @@
 		032C01A72AC22B16002955E1 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 032C018D2AC22B16002955E1 /* ContentView.swift */; };
 		032C01B72AC329B6002955E1 /* CustomViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 032C01B62AC329B6002955E1 /* CustomViews.swift */; };
 		032C01B92AC32ADF002955E1 /* CameraController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 032C01B82AC32ADF002955E1 /* CameraController.swift */; };
-		032C01EC2AC34CAC002955E1 /* libMobileNetClassifier.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 032C01CB2AC34632002955E1 /* libMobileNetClassifier.a */; platformFilter = ios; };
+		032C01EC2AC34CAC002955E1 /* libMobileNetClassifier.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 032C01CB2AC34632002955E1 /* libMobileNetClassifier.a */; };
 		032C02032AC47CFB002955E1 /* mv3_xnnpack_fp32.pte in Resources */ = {isa = PBXBuildFile; fileRef = 032C01FC2AC47CFB002955E1 /* mv3_xnnpack_fp32.pte */; };
 		032C02082AC47CFB002955E1 /* imagenet_classes.txt in Resources */ = {isa = PBXBuildFile; fileRef = 032C02012AC47CFB002955E1 /* imagenet_classes.txt */; };
+		03672A662DE1226100147123 /* backend_coreml in Frameworks */ = {isa = PBXBuildFile; productRef = 03672A652DE1226100147123 /* backend_coreml */; };
+		03672A682DE1226100147123 /* backend_mps in Frameworks */ = {isa = PBXBuildFile; productRef = 03672A672DE1226100147123 /* backend_mps */; };
+		03672A6A2DE1226100147123 /* backend_xnnpack in Frameworks */ = {isa = PBXBuildFile; productRef = 03672A692DE1226100147123 /* backend_xnnpack */; };
+		03672A732DE1231400147123 /* kernels_portable in Frameworks */ = {isa = PBXBuildFile; productRef = 03672A722DE1231400147123 /* kernels_portable */; };
+		03672A752DE144CF00147123 /* executorch_debug in Frameworks */ = {isa = PBXBuildFile; productRef = 03672A742DE144CF00147123 /* executorch_debug */; };
+		03672A772DE1457900147123 /* backend_coreml in Frameworks */ = {isa = PBXBuildFile; productRef = 03672A762DE1457900147123 /* backend_coreml */; };
+		03672A792DE1457900147123 /* backend_mps in Frameworks */ = {isa = PBXBuildFile; productRef = 03672A782DE1457900147123 /* backend_mps */; };
+		03672A7B2DE1457900147123 /* backend_xnnpack in Frameworks */ = {isa = PBXBuildFile; productRef = 03672A7A2DE1457900147123 /* backend_xnnpack */; };
+		03672A7D2DE1457900147123 /* kernels_portable in Frameworks */ = {isa = PBXBuildFile; productRef = 03672A7C2DE1457900147123 /* kernels_portable */; };
 		036834D52ACB710D00BA100F /* mv3.pte in Resources */ = {isa = PBXBuildFile; fileRef = 036834D42ACB710D00BA100F /* mv3.pte */; };
 		036834D62ACB710D00BA100F /* mv3.pte in Resources */ = {isa = PBXBuildFile; fileRef = 036834D42ACB710D00BA100F /* mv3.pte */; };
 		036834D82ACB893700BA100F /* mv3_coreml_all.pte in Resources */ = {isa = PBXBuildFile; fileRef = 036834D72ACB893700BA100F /* mv3_coreml_all.pte */; };
@@ -32,15 +41,6 @@
 		03C8184A2AC7BF470084CC29 /* mv3_xnnpack_fp32.pte in Resources */ = {isa = PBXBuildFile; fileRef = 032C01FC2AC47CFB002955E1 /* mv3_xnnpack_fp32.pte */; };
 		03C8DC7C2AE2533C0064384A /* mv3_coreml_all.pte in Resources */ = {isa = PBXBuildFile; fileRef = 036834D72ACB893700BA100F /* mv3_coreml_all.pte */; };
 		03D494E22B5B7AE900FCF524 /* mv3_mps_float16.pte in Resources */ = {isa = PBXBuildFile; fileRef = 031B92F62ACF2A5400D4EBE0 /* mv3_mps_float16.pte */; };
-		03D76BF12BAD297E0040FD82 /* backend_coreml in Frameworks */ = {isa = PBXBuildFile; productRef = 03D76BF02BAD297E0040FD82 /* backend_coreml */; };
-		03D76BF32BAD297E0040FD82 /* executorch in Frameworks */ = {isa = PBXBuildFile; productRef = 03D76BF22BAD297E0040FD82 /* executorch */; };
-		03D76BF52BAD297E0040FD82 /* backend_mps in Frameworks */ = {isa = PBXBuildFile; productRef = 03D76BF42BAD297E0040FD82 /* backend_mps */; };
-		03D76BF72BAD297E0040FD82 /* kernels_portable in Frameworks */ = {isa = PBXBuildFile; productRef = 03D76BF62BAD297E0040FD82 /* kernels_portable */; };
-		03D76BF92BAD297E0040FD82 /* backend_xnnpack in Frameworks */ = {isa = PBXBuildFile; productRef = 03D76BF82BAD297E0040FD82 /* backend_xnnpack */; };
-		03D76BFB2BAD29B60040FD82 /* backend_coreml in Frameworks */ = {isa = PBXBuildFile; productRef = 03D76BFA2BAD29B60040FD82 /* backend_coreml */; };
-		03D76BFD2BAD29B60040FD82 /* backend_mps in Frameworks */ = {isa = PBXBuildFile; productRef = 03D76BFC2BAD29B60040FD82 /* backend_mps */; };
-		03D76BFF2BAD29B60040FD82 /* kernels_portable in Frameworks */ = {isa = PBXBuildFile; productRef = 03D76BFE2BAD29B60040FD82 /* kernels_portable */; };
-		03D76C012BAD29B60040FD82 /* backend_xnnpack in Frameworks */ = {isa = PBXBuildFile; productRef = 03D76C002BAD29B60040FD82 /* backend_xnnpack */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -117,11 +117,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				03D76BF72BAD297E0040FD82 /* kernels_portable in Frameworks */,
-				03D76BF52BAD297E0040FD82 /* backend_mps in Frameworks */,
-				03D76BF92BAD297E0040FD82 /* backend_xnnpack in Frameworks */,
 				032C01EC2AC34CAC002955E1 /* libMobileNetClassifier.a in Frameworks */,
-				03D76BF12BAD297E0040FD82 /* backend_coreml in Frameworks */,
+				03672A732DE1231400147123 /* kernels_portable in Frameworks */,
+				03672A6A2DE1226100147123 /* backend_xnnpack in Frameworks */,
+				03672A682DE1226100147123 /* backend_mps in Frameworks */,
+				03672A662DE1226100147123 /* backend_coreml in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -129,7 +129,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				03D76BF32BAD297E0040FD82 /* executorch in Frameworks */,
+				03672A752DE144CF00147123 /* executorch_debug in Frameworks */,
 				03C818472AC7A1190084CC29 /* libImageClassification.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -138,11 +138,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				03D76BFF2BAD29B60040FD82 /* kernels_portable in Frameworks */,
-				03D76BFD2BAD29B60040FD82 /* backend_mps in Frameworks */,
-				03D76C012BAD29B60040FD82 /* backend_xnnpack in Frameworks */,
 				03C818282AC760650084CC29 /* libMobileNetClassifier.a in Frameworks */,
-				03D76BFB2BAD29B60040FD82 /* backend_coreml in Frameworks */,
+				03672A7B2DE1457900147123 /* backend_xnnpack in Frameworks */,
+				03672A792DE1457900147123 /* backend_mps in Frameworks */,
+				03672A772DE1457900147123 /* backend_coreml in Frameworks */,
+				03672A7D2DE1457900147123 /* kernels_portable in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -160,6 +160,7 @@
 			isa = PBXGroup;
 			children = (
 				032C01712AC228E6002955E1 /* ExecuTorchDemo */,
+				03672A6F2DE1230C00147123 /* Frameworks */,
 				032C01702AC228E6002955E1 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -245,6 +246,13 @@
 			path = MobileNet;
 			sourceTree = "<group>";
 		};
+		03672A6F2DE1230C00147123 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		03C818132AC6707F0084CC29 /* Test */ = {
 			isa = PBXGroup;
 			children = (
@@ -289,10 +297,10 @@
 			);
 			name = App;
 			packageProductDependencies = (
-				03D76BF02BAD297E0040FD82 /* backend_coreml */,
-				03D76BF42BAD297E0040FD82 /* backend_mps */,
-				03D76BF62BAD297E0040FD82 /* kernels_portable */,
-				03D76BF82BAD297E0040FD82 /* backend_xnnpack */,
+				03672A652DE1226100147123 /* backend_coreml */,
+				03672A672DE1226100147123 /* backend_mps */,
+				03672A692DE1226100147123 /* backend_xnnpack */,
+				03672A722DE1231400147123 /* kernels_portable */,
 			);
 			productName = ExecuTorchDemo;
 			productReference = 032C016F2AC228E6002955E1 /* ExecuTorchDemo.app */;
@@ -313,7 +321,7 @@
 			);
 			name = MobileNetClassifier;
 			packageProductDependencies = (
-				03D76BF22BAD297E0040FD82 /* executorch */,
+				03672A742DE144CF00147123 /* executorch_debug */,
 			);
 			productName = TorchModule;
 			productReference = 032C01CB2AC34632002955E1 /* libMobileNetClassifier.a */;
@@ -334,10 +342,10 @@
 			);
 			name = MobileNetClassifierTest;
 			packageProductDependencies = (
-				03D76BFA2BAD29B60040FD82 /* backend_coreml */,
-				03D76BFC2BAD29B60040FD82 /* backend_mps */,
-				03D76BFE2BAD29B60040FD82 /* kernels_portable */,
-				03D76C002BAD29B60040FD82 /* backend_xnnpack */,
+				03672A762DE1457900147123 /* backend_coreml */,
+				03672A782DE1457900147123 /* backend_mps */,
+				03672A7A2DE1457900147123 /* backend_xnnpack */,
+				03672A7C2DE1457900147123 /* kernels_portable */,
 			);
 			productName = ExecuTorchDemoTests;
 			productReference = 03C8180A2AC66FC30084CC29 /* MobileNetClassifierTest.xctest */;
@@ -393,7 +401,7 @@
 			);
 			mainGroup = 032C01662AC228E5002955E1;
 			packageReferences = (
-				03D76BEF2BAD297E0040FD82 /* XCRemoteSwiftPackageReference "executorch" */,
+				03672A642DE1226100147123 /* XCRemoteSwiftPackageReference "executorch" */,
 			);
 			productRefGroup = 032C01702AC228E6002955E1 /* Products */;
 			projectDirPath = "";
@@ -792,7 +800,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		03D76BEF2BAD297E0040FD82 /* XCRemoteSwiftPackageReference "executorch" */ = {
+		03672A642DE1226100147123 /* XCRemoteSwiftPackageReference "executorch" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/pytorch/executorch";
 			requirement = {
@@ -803,50 +811,50 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		03D76BF02BAD297E0040FD82 /* backend_coreml */ = {
+		03672A652DE1226100147123 /* backend_coreml */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 03D76BEF2BAD297E0040FD82 /* XCRemoteSwiftPackageReference "executorch" */;
+			package = 03672A642DE1226100147123 /* XCRemoteSwiftPackageReference "executorch" */;
 			productName = backend_coreml;
 		};
-		03D76BF22BAD297E0040FD82 /* executorch */ = {
+		03672A672DE1226100147123 /* backend_mps */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 03D76BEF2BAD297E0040FD82 /* XCRemoteSwiftPackageReference "executorch" */;
-			productName = executorch;
-		};
-		03D76BF42BAD297E0040FD82 /* backend_mps */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 03D76BEF2BAD297E0040FD82 /* XCRemoteSwiftPackageReference "executorch" */;
+			package = 03672A642DE1226100147123 /* XCRemoteSwiftPackageReference "executorch" */;
 			productName = backend_mps;
 		};
-		03D76BF62BAD297E0040FD82 /* kernels_portable */ = {
+		03672A692DE1226100147123 /* backend_xnnpack */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 03D76BEF2BAD297E0040FD82 /* XCRemoteSwiftPackageReference "executorch" */;
-			productName = kernels_portable;
-		};
-		03D76BF82BAD297E0040FD82 /* backend_xnnpack */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 03D76BEF2BAD297E0040FD82 /* XCRemoteSwiftPackageReference "executorch" */;
+			package = 03672A642DE1226100147123 /* XCRemoteSwiftPackageReference "executorch" */;
 			productName = backend_xnnpack;
 		};
-		03D76BFA2BAD29B60040FD82 /* backend_coreml */ = {
+		03672A722DE1231400147123 /* kernels_portable */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 03D76BEF2BAD297E0040FD82 /* XCRemoteSwiftPackageReference "executorch" */;
+			package = 03672A642DE1226100147123 /* XCRemoteSwiftPackageReference "executorch" */;
+			productName = kernels_portable;
+		};
+		03672A742DE144CF00147123 /* executorch_debug */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 03672A642DE1226100147123 /* XCRemoteSwiftPackageReference "executorch" */;
+			productName = executorch_debug;
+		};
+		03672A762DE1457900147123 /* backend_coreml */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 03672A642DE1226100147123 /* XCRemoteSwiftPackageReference "executorch" */;
 			productName = backend_coreml;
 		};
-		03D76BFC2BAD29B60040FD82 /* backend_mps */ = {
+		03672A782DE1457900147123 /* backend_mps */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 03D76BEF2BAD297E0040FD82 /* XCRemoteSwiftPackageReference "executorch" */;
+			package = 03672A642DE1226100147123 /* XCRemoteSwiftPackageReference "executorch" */;
 			productName = backend_mps;
 		};
-		03D76BFE2BAD29B60040FD82 /* kernels_portable */ = {
+		03672A7A2DE1457900147123 /* backend_xnnpack */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 03D76BEF2BAD297E0040FD82 /* XCRemoteSwiftPackageReference "executorch" */;
-			productName = kernels_portable;
-		};
-		03D76C002BAD29B60040FD82 /* backend_xnnpack */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 03D76BEF2BAD297E0040FD82 /* XCRemoteSwiftPackageReference "executorch" */;
+			package = 03672A642DE1226100147123 /* XCRemoteSwiftPackageReference "executorch" */;
 			productName = backend_xnnpack;
+		};
+		03672A7C2DE1457900147123 /* kernels_portable */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 03672A642DE1226100147123 /* XCRemoteSwiftPackageReference "executorch" */;
+			productName = kernels_portable;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
