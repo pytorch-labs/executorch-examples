@@ -20,6 +20,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Objects;
 import org.pytorch.executorch.EValue;
 import org.pytorch.executorch.Module;
@@ -33,6 +34,8 @@ public class MainActivity extends Activity implements Runnable {
   private Module mModule = null;
   private String mImagename = "corgi.jpeg";
 
+  private String[] mImageFiles;
+  private int mCurrentImageIndex = 0;
   // see http://host.robots.ox.ac.uk:8080/pascal/VOC/voc2007/segexamples/index.html for the list of
   // classes with indexes
   private static final int CLASSNUM = 21;
@@ -51,10 +54,29 @@ public class MainActivity extends Activity implements Runnable {
     }
   }
 
+  private void populateImagePathFromAssets() {
+    try {
+          String[] allFiles = getAssets().list("");
+          ArrayList<String> imageList = new ArrayList<>();
+          for (String file : allFiles) {
+            if (file.endsWith(".jpg") || file.endsWith(".jpeg") || file.endsWith(".png")) {
+              imageList.add(file);
+            }
+          }
+          mImageFiles = imageList.toArray(new String[0]);
+          mCurrentImageIndex = 0;
+          mImagename = mImageFiles.length > 0 ? mImageFiles[0] : null;
+        } catch (IOException e) {
+          Log.e("ImageSegmentation", "Error listing assets", e);
+          finish();
+        }
+  }
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
+    populateImagePathFromAssets();
 
     try {
       mBitmap = BitmapFactory.decodeStream(getAssets().open(mImagename), null, null);
@@ -73,13 +95,13 @@ public class MainActivity extends Activity implements Runnable {
     buttonNext.setOnClickListener(
         new View.OnClickListener() {
           public void onClick(View v) {
-            if (Objects.equals(mImagename, "corgi.jpeg")) {
-              mImagename = "dog.jpg";
-            } else if (Objects.equals(mImagename, "dog.jpg")) {
-              mImagename = "deeplab.jpg";
-            } else {
-              mImagename = "corgi.jpeg";
+            if (mImageFiles == null || mImageFiles.length == 0) {
+              // No images available
+              return;
             }
+            // Move to the next image, wrap around if at the end
+            mCurrentImageIndex = (mCurrentImageIndex + 1) % mImageFiles.length;
+            mImagename = mImageFiles[mCurrentImageIndex];
             populateImage();
           }
         });
