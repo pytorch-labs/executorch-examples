@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <!-- ImageView at the top -->
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="388dp"
@@ -18,28 +19,52 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/nextButton"
+    <!-- ProgressBar below ImageView -->
+    <ProgressBar
+        android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
+        android:visibility="invisible"
+        app:layout_constraintTop_toBottomOf="@+id/imageView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Row 1: Next and Reset buttons side by side -->
+    <Button
+        android:id="@+id/nextButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:text="@string/next"
         android:textAllCaps="false"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.45"
+        app:layout_constraintTop_toBottomOf="@+id/progressBar"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+        app:layout_constraintEnd_toStartOf="@+id/resetImage"
+        app:layout_constraintHorizontal_weight="1" />
 
     <Button
         android:id="@+id/resetImage"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="@string/reset"
         android:textAllCaps="false"
-        app:layout_constraintRight_toRightOf="@+id/nextButton"
+        app:layout_constraintTop_toBottomOf="@+id/progressBar"
         app:layout_constraintStart_toEndOf="@+id/nextButton"
-        app:layout_constraintTop_toTopOf="@+id/nextButton" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_weight="1" />
 
+    <!-- Row 2: Single button spanning width of two above -->
+    <Button
+        android:id="@+id/loadAndRefreshButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/load_and_refresh"
+        android:textAllCaps="false"
+        app:layout_constraintTop_toBottomOf="@+id/nextButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Row 3: xnnpackButton Centered Run button -->
     <Button
         android:id="@+id/xnnpackButton"
         android:layout_width="wrap_content"
@@ -47,20 +72,8 @@
         android:layout_marginTop="20dp"
         android:text="@string/run_xnnpack"
         android:textAllCaps="false"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.45"
+        app:layout_constraintTop_toBottomOf="@+id/loadAndRefreshButton"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/nextButton" />
-
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:visibility="invisible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.45"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/nextButton" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
