@@ -9,4 +9,6 @@
     <string name="segmentation_demo">Segmentation Demo</string>
     <string name="run_xnnpack">Run</string>
     <string name="reset">Reset</string>
+    <string name="load_and_refresh">Load And Refresh</string>
+    <string name="run">Run</string>
 </resources>
