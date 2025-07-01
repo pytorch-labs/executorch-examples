@@ -39,7 +39,26 @@ Run the following adb command to push the model.
 adb push dl3_xnnpack_fp32.pte /data/local/tmp/dl3_xnnpack_fp32.pte
 ```
 
-## Step 5: Run unit test
+## Step 5: Load and Test Custom Images (No APK Rebuild Needed)
+You can now test image segmentation on your own images (supported formats: .jpg, .jpeg, .png) without rebuilding the APK. The app supports loading .jpg, .jpeg, and .png images from the /sdcard/Pictures/ directory, with user-granted permissions.
+
+### How to Use
+#### a. Push your image to the device:
+```
+adb push <path to your image> /sdcard/Pictures/
+
+```
+#### b. After the push, In the app:
+- Tap the "Load And Refresh" button.
+- If prompted, grant the app permission to access the /sdcard/Pictures/ folder.
+- The image should appear immediately in the app.
+- You can now run dynamic image segmentation and view the results.
+
+Tip: You can use images containing Dog, Sheep, Person, or any combination of these classes.
+
+This feature enhances the testing/validation process by allowing users to quickly test different images without the need to rebuild the application.
+
+## Step 6: Run unit test
 ### On your terminal
 ```
 ./gradlew connectedAndroidTest
