@@ -56,14 +56,10 @@ public class MobileNetClassifier: ImageClassification {
   }
 
   public func classify(image: UIImage) throws -> [Classification] {
-    let input = try normalize(rawData(from: transformed(image))).withUnsafeBytes {
-      Tensor(bytes: $0.baseAddress!, shape: [1, 3, 224, 224], dataType: .float)
-    }
-    var output: [Float] = []
-    try module.forward(input)[0].tensor?.bytes { pointer, count, _ in
-      output = Array(UnsafeBufferPointer(start: pointer.assumingMemoryBound(to: Float.self), count: count))
-    }
-    return softmax(output)
+    try normalize(transformed(image))
+    let input = Tensor<Float>(&normalizedBuffer, shape: [1, 3, 224, 224])
+    let output: Tensor<Float> = try module.forward(input)[0].tensor()!
+    return softmax(try output.scalars())
       .enumerated()
       .sorted(by: { $0.element > $1.element })
       .compactMap { index, probability in
@@ -98,7 +94,7 @@ public class MobileNetClassifier: ImageClassification {
     return resizedAndCroppedImage
   }
 
-  private func rawData(from image: UIImage) throws -> [UInt8] {
+  private func normalize(_ image: UIImage) throws {
     guard let cgImage = image.cgImage else {
       throw MobileNetClassifierError.rawData
     }
@@ -116,20 +112,15 @@ public class MobileNetClassifier: ImageClassification {
       in: CGRect(
         origin: CGPoint.zero,
         size: CGSize(width: cgImage.width, height: cgImage.height)))
-    return rawDataBuffer
-  }
-
-  private func normalize(_ rawData: [UInt8]) -> [Float] {
     let mean: [Float] = [0.485, 0.456, 0.406]
     let std: [Float] = [0.229, 0.224, 0.225]
-    let pixelCount = rawData.count / 4
+    let pixelCount = rawDataBuffer.count / 4
 
     for i in 0..<pixelCount {
-      normalizedBuffer[i] = (Float(rawData[i * 4 + 0]) / 255 - mean[0]) / std[0]
-      normalizedBuffer[i + pixelCount] = (Float(rawData[i * 4 + 1]) / 255 - mean[1]) / std[1]
-      normalizedBuffer[i + pixelCount * 2] = (Float(rawData[i * 4 + 2]) / 255 - mean[2]) / std[2]
+      normalizedBuffer[i] = (Float(rawDataBuffer[i * 4 + 0]) / 255 - mean[0]) / std[0]
+      normalizedBuffer[i + pixelCount] = (Float(rawDataBuffer[i * 4 + 1]) / 255 - mean[1]) / std[1]
+      normalizedBuffer[i + pixelCount * 2] = (Float(rawDataBuffer[i * 4 + 2]) / 255 - mean[2]) / std[2]
     }
-    return normalizedBuffer
   }
 
   private func softmax(_ input: [Float]) -> [Float] {
