@@ -300,7 +300,6 @@
 				03672A652DE1226100147123 /* backend_coreml */,
 				03672A672DE1226100147123 /* backend_mps */,
 				03672A692DE1226100147123 /* backend_xnnpack */,
-				03672A722DE1231400147123 /* kernels_portable */,
 				03B184952E1FA1E400246294 /* kernels_optimized */,
 			);
 			productName = ExecuTorchDemo;
@@ -346,7 +345,6 @@
 				03672A762DE1457900147123 /* backend_coreml */,
 				03672A782DE1457900147123 /* backend_mps */,
 				03672A7A2DE1457900147123 /* backend_xnnpack */,
-				03672A7C2DE1457900147123 /* kernels_portable */,
 				03B184972E1FA1F400246294 /* kernels_optimized */,
 			);
 			productName = ExecuTorchDemoTests;
@@ -822,11 +820,6 @@
 			package = 03672A642DE1226100147123 /* XCRemoteSwiftPackageReference "executorch" */;
 			productName = backend_xnnpack;
 		};
-		03672A722DE1231400147123 /* kernels_portable */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 03672A642DE1226100147123 /* XCRemoteSwiftPackageReference "executorch" */;
-			productName = kernels_portable;
-		};
 		03672A742DE144CF00147123 /* executorch_debug */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 03672A642DE1226100147123 /* XCRemoteSwiftPackageReference "executorch" */;
@@ -846,11 +839,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 03672A642DE1226100147123 /* XCRemoteSwiftPackageReference "executorch" */;
 			productName = backend_xnnpack;
-		};
-		03672A7C2DE1457900147123 /* kernels_portable */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 03672A642DE1226100147123 /* XCRemoteSwiftPackageReference "executorch" */;
-			productName = kernels_portable;
 		};
 		03B184952E1FA1E400246294 /* kernels_optimized */ = {
 			isa = XCSwiftPackageProductDependency;
