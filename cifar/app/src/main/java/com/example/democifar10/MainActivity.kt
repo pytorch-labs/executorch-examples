@@ -260,13 +260,8 @@ class MainActivity : ComponentActivity() {
         SoLoader.init(this, false)
 
         // Load CIFAR-10 data from multiple batch files
-        // Use data_batch_1.bin through data_batch_4.bin for training (32,000 images)
-        // Use test_batch.bin for testing (8,000 images)
         val trainBatchFiles = listOf("train_data.bin")
-//            listOf("data_batch_1.bin", "data_batch_2.bin", "data_batch_3.bin", "data_batch_4.bin")
-//        val testBatchFiles = listOf("test_batch.bin")
         val testBatchFiles = listOf("test_data.bin")
-//        val cifar10Data = loadCifar10Data(trainBatchFiles, testBatchFiles, 32000, 8000)
         val cifar10Data = loadCifar10Data(trainBatchFiles, testBatchFiles, 1000, 1000)
 
         // Extract training and testing data
@@ -330,8 +325,6 @@ class MainActivity : ComponentActivity() {
         )
 
         try {
-//            val modelPath = assetFilePath("et_cifar10_model_without_ptd.pte")
-//            val dataPath = assetFilePath("generic_cifar_ptd_old")
             val modelPath = assetFilePath("cifar10_model.pte")
             val dataPath = assetFilePath("generic_cifar.ptd")
 
