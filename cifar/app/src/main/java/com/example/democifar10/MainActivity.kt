@@ -1,3 +1,4 @@
+package com.example.democifar10
 
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -145,8 +146,7 @@ class MainActivity : ComponentActivity() {
                 val imagesToLoad = minOf(imagesPerBatch, trainSize - trainImagesLoaded)
 
                 Log.d(
-                    "Cifar10Loader",
-                    "Loading $imagesToLoad training images from $batchFile"
+                    "Cifar10Loader", "Loading $imagesToLoad training images from $batchFile"
                 )
 
                 // Read the batch file
@@ -194,8 +194,7 @@ class MainActivity : ComponentActivity() {
                 val imagesToLoad = minOf(imagesPerBatch, testSize - testImagesLoaded)
 
                 Log.d(
-                    "Cifar10Loader",
-                    "Loading $imagesToLoad testing images from $batchFile"
+                    "Cifar10Loader", "Loading $imagesToLoad testing images from $batchFile"
                 )
 
                 // Read the batch file
@@ -263,8 +262,7 @@ class MainActivity : ComponentActivity() {
         // Load CIFAR-10 data from multiple batch files
         // Use data_batch_1.bin through data_batch_4.bin for training (32,000 images)
         // Use test_batch.bin for testing (8,000 images)
-        val trainBatchFiles =
-            listOf("train_data.bin")
+        val trainBatchFiles = listOf("train_data.bin")
 //            listOf("data_batch_1.bin", "data_batch_2.bin", "data_batch_3.bin", "data_batch_4.bin")
 //        val testBatchFiles = listOf("test_batch.bin")
         val testBatchFiles = listOf("test_data.bin")
@@ -281,12 +279,10 @@ class MainActivity : ComponentActivity() {
         val tstLblData = testData?.second
 
         Log.d(
-            "ExecuTorchApp",
-            "Loaded ${trnImgData?.size?.div(pixelsPerImage) ?: 0} training images"
+            "ExecuTorchApp", "Loaded ${trnImgData?.size?.div(pixelsPerImage) ?: 0} training images"
         )
         Log.d(
-            "ExecuTorchApp",
-            "Loaded ${tstImgData?.size?.div(pixelsPerImage) ?: 0} testing images"
+            "ExecuTorchApp", "Loaded ${tstImgData?.size?.div(pixelsPerImage) ?: 0} testing images"
         )
 
         // Get a batch of 4 images from the test image and labels data for testing
@@ -322,13 +318,15 @@ class MainActivity : ComponentActivity() {
         Log.d("ExecuTorchApp", "Label values: ${batchTestLabelBuffer.contentToString()}")
         for (i in batchTestLabelBuffer.indices) {
             if (batchTestLabelBuffer[i] < 0 || batchTestLabelBuffer[i] >= 10) {
-                Log.e("ExecuTorchApp", "Invalid label value at index $i: ${batchTestLabelBuffer[i]} (should be 0-9)")
+                Log.e(
+                    "ExecuTorchApp",
+                    "Invalid label value at index $i: ${batchTestLabelBuffer[i]} (should be 0-9)"
+                )
             }
         }
 
         val testLabelBuffer = Tensor.fromBlob(
-            batchTestLabelBuffer,
-            longArrayOf(batchSize.toLong())
+            batchTestLabelBuffer, longArrayOf(batchSize.toLong())
         )
 
         try {
@@ -341,8 +339,14 @@ class MainActivity : ComponentActivity() {
             val modelFile = File(modelPath)
             val dataFile = File(dataPath)
 
-            Log.d("ExecuTorchApp", "Model file exists: ${modelFile.exists()}, readable: ${modelFile.canRead()}, size: ${modelFile.length()}")
-            Log.d("ExecuTorchApp", "Data file exists: ${dataFile.exists()}, readable: ${dataFile.canRead()}, size: ${dataFile.length()}")
+            Log.d(
+                "ExecuTorchApp",
+                "Model file exists: ${modelFile.exists()}, readable: ${modelFile.canRead()}, size: ${modelFile.length()}"
+            )
+            Log.d(
+                "ExecuTorchApp",
+                "Data file exists: ${dataFile.exists()}, readable: ${dataFile.canRead()}, size: ${dataFile.length()}"
+            )
 
             // Load the training module
             tModule = TrainingModule.load(modelPath, dataPath)
@@ -374,10 +378,8 @@ class MainActivity : ComponentActivity() {
         if (testLabelBuffer != null) {
             val resultTextView: TextView = findViewById(R.id.resultTextView)
             val truthTextView: TextView = findViewById(R.id.truthTextView)
-            resultTextView.text =
-                "Loss: ${0.00}"
-            truthTextView.text =
-                "Ground truth: ${"None"}"
+            resultTextView.text = "Loss: ${0.00}"
+            truthTextView.text = "Ground truth: ${"None"}"
         } else {
             Log.e("ExecuTorchApp", "Error loading test label buffer")
         }
@@ -403,13 +405,7 @@ class MainActivity : ComponentActivity() {
 
             // Start fine-tuning with 5 epochs
             trainModel(
-                tModule!!,
-                trnImgData!!,
-                trnLblData!!,
-                tstImgData!!,
-                tstLblData!!,
-                100,
-                batchSize
+                tModule!!, trnImgData!!, trnLblData!!, tstImgData!!, tstLblData!!, 100, batchSize
             )
         }
 
@@ -464,8 +460,7 @@ class MainActivity : ComponentActivity() {
         for (batch in 0 until num_test_batches) {
             // No need to update UI for each batch
             val startIdx = batch * batchSize * height * width * channels
-            val endIdx =
-                minOf((batch + 1) * batchSize * height * width * channels, tstImgData.size)
+            val endIdx = minOf((batch + 1) * batchSize * height * width * channels, tstImgData.size)
             val imgData = tstImgData.slice(startIdx until endIdx)
 
             val lblStartIdx = batch * batchSize
@@ -475,11 +470,7 @@ class MainActivity : ComponentActivity() {
             // Apply test transformations to the evaluation data
             // This includes normalization but no data augmentation
             val transformedData = ImageTransformations.applyBatchTestTransformations(
-                imgData.toByteArray(),
-                batchSize,
-                width,
-                height,
-                channels
+                imgData.toByteArray(), batchSize, width, height, channels
             )
 
             // Create a direct FloatBuffer as required by Tensor.fromBlob
@@ -488,20 +479,14 @@ class MainActivity : ComponentActivity() {
             buffer.rewind() // Reset position to the beginning of the buffer
 
             val batchTestImageTensor = Tensor.fromBlob(
-                buffer,
-                longArrayOf(
-                    batchSize.toLong(),
-                    channels.toLong(),
-                    height.toLong(),
-                    width.toLong()
+                buffer, longArrayOf(
+                    batchSize.toLong(), channels.toLong(), height.toLong(), width.toLong()
                 )
             )
 
-            val batchTestLabelBuffer =
-                LongArray(batchSize) { lblData[it].toLong() }
+            val batchTestLabelBuffer = LongArray(batchSize) { lblData[it].toLong() }
             val testLabelBuffer = Tensor.fromBlob(
-                batchTestLabelBuffer,
-                longArrayOf(batchSize.toLong())
+                batchTestLabelBuffer, longArrayOf(batchSize.toLong())
             )
 
             val inputEValues =
@@ -531,8 +516,15 @@ class MainActivity : ComponentActivity() {
 
         Log.d(
             "ExecuTorchApp",
-            "Evaluation complete - Loss: ${val_loss / val_total * batchSize}, Accuracy: $val_accuracy%, " +
-                    "Time: ${String.format("%.2f", duration)} s, " + "Time per image: ${String.format("%.2f", (duration / val_total) * 1000)} ms"
+            "Evaluation complete - Loss: ${val_loss / val_total * batchSize}, Accuracy: $val_accuracy%, " + "Time: ${
+                String.format(
+                    "%.2f", duration
+                )
+            } s, " + "Time per image: ${
+                String.format(
+                    "%.2f", (duration / val_total) * 1000
+                )
+            } ms"
         )
 
         // Update UI with the evaluation results and hide progress container only if updateUI is true
@@ -636,11 +628,7 @@ class MainActivity : ComponentActivity() {
                 // Apply data augmentation transformations to the training data
                 // This includes padding, random crop, horizontal flip, and normalization
                 val transformedData = ImageTransformations.applyBatchTransformations(
-                    imgData,
-                    batchSize,
-                    width,
-                    height,
-                    channels
+                    imgData, batchSize, width, height, channels
                 )
 
                 // Create a direct FloatBuffer as required by Tensor.fromBlob
@@ -648,19 +636,14 @@ class MainActivity : ComponentActivity() {
                 buffer.put(transformedData)
                 buffer.rewind() // Reset position to the beginning of the buffer
                 val batchTrainImageTensor = Tensor.fromBlob(
-                    buffer,
-                    longArrayOf(
-                        batchSize.toLong(),
-                        channels.toLong(),
-                        height.toLong(),
-                        width.toLong()
+                    buffer, longArrayOf(
+                        batchSize.toLong(), channels.toLong(), height.toLong(), width.toLong()
                     )
                 )
                 val batchTrainLabelBuffer =
                     LongArray(batchSize) { lblData?.get(it.toInt())?.toLong() ?: 0 }
                 val trainLabelBuffer = Tensor.fromBlob(
-                    batchTrainLabelBuffer,
-                    longArrayOf(batchSize.toLong())
+                    batchTrainLabelBuffer, longArrayOf(batchSize.toLong())
                 )
                 val inputEValues =
                     arrayOf(EValue.from(batchTrainImageTensor), EValue.from(trainLabelBuffer))
@@ -689,10 +672,16 @@ class MainActivity : ComponentActivity() {
 
             Log.d(
                 "ExecuTorchApp",
-                "Epoch [$epoch/$epochs] Loss: ${epoch_loss / tot_train_samples * batchSize}, " +
-                        "Accuracy: ${100 * train_correct / train_total}%, " +
-                        "Time: ${String.format("%.2f", epochDuration)} s, " +
-                        "Time per image: ${String.format("%.2f", 1000 * (epochDuration / tot_train_samples))} ms"
+                "Epoch [$epoch/$epochs] Loss: ${epoch_loss / tot_train_samples * batchSize}, " + "Accuracy: ${100 * train_correct / train_total}%, " + "Time: ${
+                    String.format(
+                        "%.2f",
+                        epochDuration
+                    )
+                } s, " + "Time per image: ${
+                    String.format(
+                        "%.2f", 1000 * (epochDuration / tot_train_samples)
+                    )
+                } ms"
             )
 
             // Evaluate the model using the test data and the evaluateModel function

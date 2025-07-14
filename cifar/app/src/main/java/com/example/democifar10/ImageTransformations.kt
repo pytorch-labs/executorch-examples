@@ -1,6 +1,5 @@
 package com.example.democifar10
 
-
 import kotlin.random.Random
 
 /**
