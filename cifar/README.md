@@ -30,7 +30,7 @@ export ANDROID_NDK=$ANDROID_HOME/ndk/28.0.12433566/
 export PATH=$ANDROID_HOME/cmake/4.0.2/bin:$PATH
 ```
 
-**NOTE** For the updated tutorial refer to the official guide [here](https://github.com/pytorch/executorch/blob/main/extension/android/README.md).
+**NOTE** For the updated steps for building the dependencies refer to the official repository over [here](https://github.com/pytorch/executorch/blob/main/extension/android/README.md).
 
 To install ExecuTorch in a python environment we can use the following commands in a new terminal:
 
@@ -91,24 +91,28 @@ Finally, the `.aar` file can be found here:
 
 5. Create a new directory named assets in the [main](./app/src/main) directory (you should automatically be presented with the option to select the assets directory from the gradle source set when you create the new directory) ![Image](./images/Pasted%20image%2020250709164842.png)
 
-6. Copy the binary files () generated from the CIFAR 10 example on [ExecuTorch repo]() into the Copy all the CIFAR 10 dataset into this [directory](./app/src/main/assets/cifar-10-batches-bin)
+6. Copy the binary files (`train_data.bin` and `test_data.bin`) generated during the execution of the CIFAR 10 example on [ExecuTorch official repo](https://github.com/pytorch/executorch/tree/main/extension/training/examples/CIFAR) into this [directory](./app/src/main/assets/cifar-10-batches-bin) using the following command:
 
     ```bash
     (base) USERNAME@USERNAME-mbp ~ % cp -r cifar-10-batches-bin /Users/<USERNAME>/AndroidStudioProjects/DemoCIFAR10/app/src/main/assets
     ```
+    **Note:** The example code can be run with the following command:
+    ```bash
+    python3 main.py --model-path cifar10_model.pth --pte-model-path cifar10_model.pte --split-pte-model-path cifar10_model_pte_only.pte --save-pt-json cifar10_pt.json --save-et-json cifar10_et.json --ptd-model-dir . --epochs 10 --fine-tune-epochs 50
+    ```
 
 7. Edit the `build.gradle.kts` file inside the [app](./app) directory to have [this](./app/build.gradle.kts) content:
 
-8. Create the `ImageTransformations.kt` object file inside [this](./app/src/main/java/com/example/democifar10/) directory as shown here:
+8. Create the `ImageTransformations.kt` object file inside the [java/com/example/democifar10](./app/src/main/java/com/example/democifar10/) directory as shown here:
     ![ImageTransformations](./images/Pasted%20image%2020250709165757.png)
 
 - Content for the `ImageTransformations.kt` file can be found [here](app/src/main/java/com/example/democifar10/ImageTransformations.kt).
 
-9. Create the `Cifar10ImageExtractor.kt` class file in the [this](./app/src/main/java/com/example/democifar10) directory![](./images/Pasted%20image%2020250709170006.png)
+9. Create the `Cifar10ImageExtractor.kt` class file in the [java/com/example/democifar10](./app/src/main/java/com/example/democifar10) directory![](./images/Pasted%20image%2020250709170006.png)
 
 - Content for the `Cifar10ImageExtractor.kt` class can be found [here](./app/src/main/java/com/example/democifar10/Cifar10ImageExtractor.kt).
 
-10. Copy the assets into the assets directory:
+10. Copy the assets generated in during the execution of the [CIFAR 10 example](https://github.com/pytorch/executorch/tree/main/extension/training/examples/CIFAR) into the assets directory using the following commands:
 
     ```bash
     (base) USERNAME@USERNAME-mbp ~ % cp generic_cifar.ptd /Users/<USERNAME>/AndroidStudioProjects/DemoCIFAR10/app/src/main/assets
@@ -118,21 +122,23 @@ Finally, the `.aar` file can be found here:
     (base) USERNAME@USERNAME-mbp ~ % cp executorch.aar /Users/<USERNAME>/AndroidStudioProjects/DemoCIFAR10/app/libs
     ```
 
-11. Finally edit the content for the `MainActivity.kt` file can be found [here](./app/src/main/java/com/example/democifar10/MainActivity.kt):
+11. Finally edit the `MainActivity.kt` file with the code from [here](./app/src/main/java/com/example/democifar10/MainActivity.kt):
 
 12. Sync your Gradle build: ![](./images/Pasted%20image%2020250709170528.png)
 
 
-- The build was successful: ![](./images/Pasted%20image%2020250709171142.png)
+- You'll be notified that the build was successful: ![](./images/Pasted%20image%2020250709171142.png)
 
 
-13. Click on run: ![](./images/Pasted%20image%2020250709170837.png)
+13. Click on run to proceed: ![](./images/Pasted%20image%2020250709170837.png)
 
 14. Click on the fine-tune button and the training begins for `150` epochs![[Pasted image 20250709171210.png]]
 
+    **Note:** The training parameters can be tweaked in `MainActivity.kt`
+
 ### Summary:
 
-We start with training loss of `2.159132883071899`, training accuracy of `18%`, testing loss of `2.1072397136688235`, and testing accuracy of `29%`
+We trained the PyTorch model for `1 epoch` and exported the `.pte` and `.ptd` files. We started with training loss of `2.159132883071899`, training accuracy of `18%`, testing loss of `2.1072397136688235`, and testing accuracy of `29%`
 
 ```log
 2025-07-09 17:11:46.309 13277-13277 ExecuTorchApp           com.example.democifar10              D  Starting Epoch 1/150
@@ -144,7 +150,7 @@ We start with training loss of `2.159132883071899`, training accuracy of `18%`, 
 2025-07-09 17:11:47.989 13277-13277 ExecuTorchApp           com.example.democifar10              D  Evaluation complete - Loss: 2.1072397136688235, Accuracy: 29.0%, Time: 0.27 s, Time per image: 2.73 ms
 ```
 
-We finish with training loss of `1.7837489886283875`, training accuracy of `35%`, testing loss of `2.0501016211509704`, and testing accuracy of `38%` after 150 epochs
+We reached a training loss of `1.7837489886283875`, training accuracy of `35%`, testing loss of `2.0501016211509704`, and testing accuracy of `38%` after `150 epochs`
 
 ```log
 2025-07-09 17:13:59.889 13277-13277 ExecuTorchApp           com.example.democifar10              D  Starting Epoch 150/150
@@ -163,7 +169,7 @@ Check if the `local.properties` file is present in the `extension/android` direc
 $ cat <PARENT_DIRECTORY>/executorch/extension/android/local.properties
 ```
 
-**NOTE:** If this file (`local.properties`) is missing and the build fails because the script can't fetch the path for the android sdk from the env variables. If you encounter this issue, please follow the following steps:
+**NOTE:** If this file (`local.properties`) is missing, the build process will fail because the script can't retrieve the path for the android sdk from the env variables. If you encounter this issue, please follow the following steps:
 
 ```bash
 $ touch <PARENT_DIRECTORY>/executorch/extension/android/local.properties
