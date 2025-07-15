@@ -98,7 +98,7 @@ Finally, the `.aar` file can be found here:
     ```
     **Note:** The example code can be run with the following command:
     ```bash
-    python3 main.py --model-path cifar10_model.pth --pte-model-path cifar10_model.pte --split-pte-model-path cifar10_model_pte_only.pte --save-pt-json cifar10_pt.json --save-et-json cifar10_et.json --ptd-model-dir . --epochs 10 --fine-tune-epochs 50
+    python3 main.py --model-path cifar10_model.pth --pte-model-path cifar10_model_pte_only.pte --split-pte-model-path cifar10_model.pte --save-pt-json cifar10_pt.json --save-et-json cifar10_et.json --ptd-model-dir . --epochs 10 --fine-tune-epochs 50
     ```
 
 7. Edit the `build.gradle.kts` file inside the [app](./app) directory to have [this](./app/build.gradle.kts) content:
