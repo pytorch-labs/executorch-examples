@@ -4,49 +4,39 @@ In this tutorial, we will be fine-tuning a CIFAR 10 model on an android app usin
 
 ## Environment Setup
 
+### Android Environment Setup
+
 For the android environment setup, follow these steps:
 
-1. Install Open JDK using: `brew install openjdk@17`
+1. Make sure that you have [OpenJDK](https://openjdk.org/) installed and configured on your machine.
 2. Download and install the latest version of [Android Studio](https://developer.android.com/studio/)  .
 3. Start Android Studio and open the **Settings** dialog (gear icon on the bottom left).
 4. Navigate to **Languages & Frameworks**, then **Android SDK**.
 5. In the **SDK Platforms** tab, check **Android 14.0 (“UpsideDownCake”)** and **Android API 36**.
 6. In the **SDK Tools** tab, check **Android SDK Build-Tools 36**, **NDK (Side by side)**, **Android SDK Command-line Tools (latest)**, **CMake**, **Android Emulator**, and **Android SDK Platform-Tools**.
-7. Export the paths for these to your environment or add them to the `.bashrc` or `.zshrc` files:
-```bash
-# JAVA config
-export JAVA_HOME=/opt/homebrew/opt/openjdk@17/
-export PATH="$JAVA_HOME/bin:$PATH"
-
-# Android dev config
-export ANDROID_HOME=$HOME/Library/Android/sdk
-export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
-export PATH=$ANDROID_HOME/platform-tools:$PATH
-export PATH=$ANDROID_HOME/emulator:$PATH
-export PATH=$ANDROID_HOME/build-tools/latest:$PATH
-export ANDROID_NDK=$ANDROID_HOME/ndk/28.0.12433566/
-
-# Cmake config
-export PATH=$ANDROID_HOME/cmake/4.0.2/bin:$PATH
-```
+7. Ensure the following environment variables are set: 
+    - `JAVA_HOME`
+    - `ANDROID_NDK`
+    - `ANDROID_SDK`
 
 **NOTE** For the updated steps for building the dependencies refer to the official repository over [here](https://github.com/pytorch/executorch/blob/main/extension/android/README.md).
 
-To install ExecuTorch in a python environment we can use the following commands in a new terminal:
+### ExecuTorch Environment Setup
+
+To ensure better management of Python environments and packages, it is recommended to use a Python environment management tool such as `conda`, `venv`, or `uv`. For this demonstration, we will use `uv` to set up the Python environment. 
+
+To install ExecuTorch in a `uv` Python environment use the following commands:
 
 ```bash
-$ git clone https://github.com/pytorch/executorch.git
+$ git clone https://github.com/pytorch/executorch.git --recurse-submodules
 $ cd executorch
 $ uv venv --seed --prompt et --python 3.10
 $ source .venv/bin/activate
-$ which python
 $ git fetch origin
 $ git submodule sync --recursive
 $ git submodule update --init --recursive
-$ ./install_requirements.sh
 $ ./install_executorch.sh
-$ sh ./scripts/build_android_library.sh
-$ echo $ANDROID_HOME
+$ ./scripts/build_android_library.sh
 ```
 
 If you run into errors for sdk path, complete the above steps in the [Trouble Shooting](#trouble-shooting) section before proceeding with the following steps:
