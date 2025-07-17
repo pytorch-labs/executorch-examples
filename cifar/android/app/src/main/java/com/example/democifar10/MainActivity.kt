@@ -21,6 +21,7 @@ import kotlin.jvm.Throws
 
 class MainActivity : ComponentActivity() {
     private var tModule: TrainingModule? = null
+    private var debugTag: String? = "ExecuTorchApp"
 
     @Throws(IOException::class)
     private fun assetFilePath(assetName: String): String {
@@ -48,7 +49,7 @@ class MainActivity : ComponentActivity() {
             }
             return file.absolutePath
         } catch (e: IOException) {
-            Log.e("AssetCopy", "Error copying asset $assetName: ${e.message}")
+            Log.e(debugTag, "Error copying asset $assetName: ${e.message}")
             throw e
         }
     }
@@ -88,9 +89,9 @@ class MainActivity : ComponentActivity() {
             FileOutputStream(file).use { out ->
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
             }
-            Log.d("ExecuTorchApp", "Saved image to ${file.absolutePath}")
+            Log.d(debugTag, "Saved image to ${file.absolutePath}")
         } catch (e: IOException) {
-            Log.e("ExecuTorchApp", "Error saving image", e)
+            Log.e(debugTag, "Error saving image", e)
         }
     }
 
@@ -146,7 +147,7 @@ class MainActivity : ComponentActivity() {
                 val imagesToLoad = minOf(imagesPerBatch, trainSize - trainImagesLoaded)
 
                 Log.d(
-                    "Cifar10Loader", "Loading $imagesToLoad training images from $batchFile"
+                    debugTag, "Loading $imagesToLoad training images from $batchFile"
                 )
 
                 // Read the batch file
@@ -171,7 +172,7 @@ class MainActivity : ComponentActivity() {
                 }
 
                 trainImagesLoaded += imagesToLoad
-                Log.d("Cifar10Loader", "Total training images loaded so far: $trainImagesLoaded")
+                Log.d(debugTag, "Total training images loaded so far: $trainImagesLoaded")
             }
 
             // Load testing data from multiple batch files
@@ -194,7 +195,7 @@ class MainActivity : ComponentActivity() {
                 val imagesToLoad = minOf(imagesPerBatch, testSize - testImagesLoaded)
 
                 Log.d(
-                    "Cifar10Loader", "Loading $imagesToLoad testing images from $batchFile"
+                    debugTag, "Loading $imagesToLoad testing images from $batchFile"
                 )
 
                 // Read the batch file
@@ -219,26 +220,26 @@ class MainActivity : ComponentActivity() {
                 }
 
                 testImagesLoaded += imagesToLoad
-                Log.d("Cifar10Loader", "Total testing images loaded so far: $testImagesLoaded")
+                Log.d(debugTag, "Total testing images loaded so far: $testImagesLoaded")
             }
 
             Log.d(
-                "Cifar10Loader",
+                debugTag,
                 "Successfully loaded $trainImagesLoaded training and $testImagesLoaded testing images"
             )
             Log.d(
-                "Cifar10Loader",
+                debugTag,
                 "Training data: ${trainImgData.size} bytes, ${trainLblData.size} labels"
             )
             Log.d(
-                "Cifar10Loader",
+                debugTag,
                 "Testing data: ${testImgData.size} bytes, ${testLblData.size} labels"
             )
 
             return Pair(Pair(trainImgData, trainLblData), Pair(testImgData, testLblData))
 
         } catch (e: IOException) {
-            Log.e("Cifar10Loader", "Error loading CIFAR-10 data: ${e.message}")
+            Log.e(debugTag, "Error loading CIFAR-10 data: ${e.message}")
             e.printStackTrace()
             return null
         }
@@ -274,10 +275,10 @@ class MainActivity : ComponentActivity() {
         val tstLblData = testData?.second
 
         Log.d(
-            "ExecuTorchApp", "Loaded ${trnImgData?.size?.div(pixelsPerImage) ?: 0} training images"
+            debugTag, "Loaded ${trnImgData?.size?.div(pixelsPerImage) ?: 0} training images"
         )
         Log.d(
-            "ExecuTorchApp", "Loaded ${tstImgData?.size?.div(pixelsPerImage) ?: 0} testing images"
+            debugTag, "Loaded ${tstImgData?.size?.div(pixelsPerImage) ?: 0} testing images"
         )
 
         // Get a batch of 4 images from the test image and labels data for testing
@@ -286,9 +287,11 @@ class MainActivity : ComponentActivity() {
 
         // Create a direct ByteBuffer as required by Tensor.fromBlob
         val buffer = Tensor.allocateFloatBuffer(imgData?.size ?: 0)
-        // Convert ByteArray to FloatArray before putting into FloatBuffer
+        // Convert ByteArray to FloatArray with proper normalization (0-255 -> 0-1)
         val floatArray = FloatArray(imgData?.size ?: 0)
-        imgData?.forEachIndexed { index, byte -> floatArray[index] = byte.toFloat() }
+        imgData?.forEachIndexed { index, byte ->
+            floatArray[index] = (byte.toInt() and 0xFF) / 255.0f
+        }
         buffer.put(floatArray)
         buffer.rewind() // Reset position to the beginning of the buffer
 
@@ -297,7 +300,7 @@ class MainActivity : ComponentActivity() {
             longArrayOf(batchSize.toLong(), channels.toLong(), height.toLong(), width.toLong())
         )
         Log.d(
-            "ExecuTorchApp",
+            debugTag,
             "Image tensor shape from test bin: ${batchTestImageTensor.shape().joinToString(", ")}"
         )
 
@@ -309,16 +312,6 @@ class MainActivity : ComponentActivity() {
 
         val batchTestLabelBuffer = LongArray(batchSize) { lblData?.get(it.toInt())?.toLong() ?: 0 }
 
-        // Debug: Check label values to ensure they're in valid range [0, 9] for CIFAR-10
-        Log.d("ExecuTorchApp", "Label values: ${batchTestLabelBuffer.contentToString()}")
-        for (i in batchTestLabelBuffer.indices) {
-            if (batchTestLabelBuffer[i] < 0 || batchTestLabelBuffer[i] >= 10) {
-                Log.e(
-                    "ExecuTorchApp",
-                    "Invalid label value at index $i: ${batchTestLabelBuffer[i]} (should be 0-9)"
-                )
-            }
-        }
 
         val testLabelBuffer = Tensor.fromBlob(
             batchTestLabelBuffer, longArrayOf(batchSize.toLong())
@@ -333,24 +326,23 @@ class MainActivity : ComponentActivity() {
             val dataFile = File(dataPath)
 
             Log.d(
-                "ExecuTorchApp",
+                debugTag,
                 "Model file exists: ${modelFile.exists()}, readable: ${modelFile.canRead()}, size: ${modelFile.length()}"
             )
             Log.d(
-                "ExecuTorchApp",
+                debugTag,
                 "Data file exists: ${dataFile.exists()}, readable: ${dataFile.canRead()}, size: ${dataFile.length()}"
             )
 
             // Load the training module
             tModule = TrainingModule.load(modelPath, dataPath)
-            Log.d("ExecuTorchApp", "TrainingModule loaded successfully")
+            Log.d(debugTag, "TrainingModule loaded successfully")
         } catch (e: Exception) {
-            Log.e("ExecuTorchApp", "Error loading the pte or the ptd model: ${e.message}", e)
+            Log.e(debugTag, "Error loading the pte or the ptd model: ${e.message}", e)
             e.printStackTrace()
             finish()
         }
 
-        // Let's run the inference using the batchTestImageTensor and testLabelBuffer and log the results
         val inputEValues = arrayOf(EValue.from(batchTestImageTensor), EValue.from(testLabelBuffer))
         val outputEValues = tModule?.executeForwardBackward("forward", *inputEValues)
             ?: throw IllegalStateException("Execution module is not loaded.")
@@ -360,11 +352,11 @@ class MainActivity : ComponentActivity() {
                 val data = tensor.getDataAsFloatArray()
                 val shape = tensor.shape()
                 Log.d(
-                    "ExecuTorchApp",
+                    debugTag,
                     "EValue[$i]: shape=${shape.contentToString()}, first few values=${data.take(10)}"
                 )
             } catch (e: Exception) {
-                Log.d("ExecuTorchApp", "EValue[$i]: Unable to extract tensor data: ${e.message}")
+                Log.d(debugTag, "EValue[$i]: Unable to extract tensor data: ${e.message}")
             }
         }
 
@@ -374,7 +366,7 @@ class MainActivity : ComponentActivity() {
             resultTextView.text = "Loss: ${0.00}"
             truthTextView.text = "Ground truth: ${"None"}"
         } else {
-            Log.e("ExecuTorchApp", "Error loading test label buffer")
+            Log.e(debugTag, "Error loading test label buffer")
         }
 
         // Set up button click listeners
@@ -396,9 +388,9 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            // Start fine-tuning with 5 epochs
+            // Start fine-tuning
             trainModel(
-                tModule!!, trnImgData!!, trnLblData!!, tstImgData!!, tstLblData!!, 100, batchSize
+                tModule!!, trnImgData!!, trnLblData!!, tstImgData!!, tstLblData!!, 5, batchSize
             )
         }
 
@@ -422,7 +414,7 @@ class MainActivity : ComponentActivity() {
 
         // Start timing the evaluation process
         val startTime = System.currentTimeMillis()
-        Log.d("ExecuTorchApp", "Starting evaluation")
+        Log.d(debugTag, "Starting evaluation")
 
         // Only update UI if not called from trainModel
         if (updateUI) {
@@ -446,7 +438,7 @@ class MainActivity : ComponentActivity() {
         val num_test_batches = limited_test_samples / batchSize
 
         Log.d(
-            "ExecuTorchApp",
+            debugTag,
             "Evaluating model on ${limited_test_samples} test images (${num_test_batches} batches) out of ${tot_test_samples} total images"
         )
 
@@ -508,7 +500,7 @@ class MainActivity : ComponentActivity() {
         val duration = (endTime - startTime) / 1000.0 // Convert to seconds
 
         Log.d(
-            "ExecuTorchApp",
+            debugTag,
             "Evaluation complete - Loss: ${val_loss / val_total * batchSize}, Accuracy: $val_accuracy%, " + "Time: ${
                 String.format(
                     "%.2f", duration
@@ -575,14 +567,14 @@ class MainActivity : ComponentActivity() {
             // Shuffle the indices at the beginning of each epoch
             indices.shuffle()
 
-            Log.d("ExecuTorchApp", "Starting Epoch $epoch/$epochs")
+            Log.d(debugTag, "Starting Epoch $epoch/$epochs")
 
             // Update status text for new epoch
             runOnUiThread {
                 try {
                     statusText.text = "Training: Epoch $epoch/$epochs"
                 } catch (e: Exception) {
-                    Log.e("ExecuTorchApp", "Error updating status text: ${e.message}")
+                    Log.e(debugTag, "Error updating status text: ${e.message}")
                 }
             }
             var epoch_loss = 0.0
@@ -590,7 +582,7 @@ class MainActivity : ComponentActivity() {
             var train_total = 0
 
             Log.d(
-                "ExecuTorchApp",
+                debugTag,
                 "Total images to be trained: ${tot_train_samples}, Number of batches: ${num_batches}"
             )
 
@@ -664,7 +656,7 @@ class MainActivity : ComponentActivity() {
             val epochDuration = (epochEndTime - epochStartTime) / 1000.0 // Convert to seconds
 
             Log.d(
-                "ExecuTorchApp",
+                debugTag,
                 "Epoch [$epoch/$epochs] Loss: ${epoch_loss / tot_train_samples * batchSize}, " + "Accuracy: ${100 * train_correct / train_total}%, " + "Time: ${
                     String.format(
                         "%.2f",
