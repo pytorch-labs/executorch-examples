@@ -14,7 +14,7 @@ For the android environment setup, follow these steps:
 4. Navigate to **Languages & Frameworks**, then **Android SDK**.
 5. In the **SDK Platforms** tab, check **Android 14.0 (“UpsideDownCake”)** and **Android API 36**.
 6. In the **SDK Tools** tab, check **Android SDK Build-Tools 36**, **NDK (Side by side)**, **Android SDK Command-line Tools (latest)**, **CMake**, **Android Emulator**, and **Android SDK Platform-Tools**.
-7. Ensure the following environment variables are set: 
+7. Ensure the following environment variables are set:
     - `JAVA_HOME`
     - `ANDROID_NDK`
     - `ANDROID_SDK`
@@ -23,7 +23,7 @@ For the android environment setup, follow these steps:
 
 ### ExecuTorch Environment Setup
 
-To ensure better management of Python environments and packages, it is recommended to use a Python environment management tool such as `conda`, `venv`, or `uv`. For this demonstration, we will use `uv` to set up the Python environment. 
+To ensure better management of Python environments and packages, it is recommended to use a Python environment management tool such as `conda`, `venv`, or `uv`. For this demonstration, we will use `uv` to set up the Python environment.
 
 To install ExecuTorch in a `uv` Python environment use the following commands:
 
@@ -64,55 +64,30 @@ Finally, the `.aar` file can be found here:
 
 **Note:** We will rename this file to `executorch.aar` and copy it into the `libs` directory of the android app.
 
+## Prerequisites
+
+Refer to this example for the [CIFAR 10 example](https://github.com/pytorch/executorch/tree/main/extension/training/examples/CIFAR) on the official ExecuTorch repository to generate the binary files (`train_data.bin` and `test_data.bin`) and the model files (`generic_cifar.ptd` and `generic_cifar.pte`) required for this tutorial.
+
 ## Creation of Android App
 
-1. Start with a new empty project in android studio:
-    ![](./images/Pasted%20image%2020250709162820.png)
+1. Start with a clone of this repository and open the project in Android Studio.
 
-2. Set the following configurations for the project:
-    ![](./images/Pasted%20image%2020250709163001.png)
+2. Set the minimum SDK version to `API 34`.
 
-3. You'll be presented with a setup looking somewhat like this (after the build is complete and you select Project from the dropdown menu on the top left):
-    ![](./images/Pasted%20image%2020250709163834.png)
+3. Wait for the Gradle sync to complete.
 
-4. Create a new directory named '`layout`' inside '`res`' and then create '`activity_main.xml`' file in the layout directory with [this](./app/src/main/res/layout/activity_main.xml) content.
-    - Copy the following content of [this](./app/src/main/res/layout/activity_main.xml) XML script into the `activity_main.xml` file to get the following layout with two buttons for Fine-Tuning and Model Evaluation:
-    ![](./images/Pasted%20image%2020250709164234.png)
-
-5. Create a new directory named assets in the [main](./app/src/main) directory (you should automatically be presented with the option to select the assets directory from the gradle source set when you create the new directory) ![Image](./images/Pasted%20image%2020250709164842.png)
-
-6. Copy the binary files (`train_data.bin` and `test_data.bin`) generated during the execution of the CIFAR 10 example on [ExecuTorch official repo](https://github.com/pytorch/executorch/tree/main/extension/training/examples/CIFAR) into this [directory](./app/src/main/assets/cifar-10-batches-bin) using the following command:
+4. Copy the binary files (`train_data.bin` and `test_data.bin`) generated during the execution of the CIFAR 10 example from the [Prerequisites](#prerequisites) section into this [directory](./app/src/main/assets/cifar-10-batches-bin) using the following command:
 
     ```bash
-    (base) USERNAME@USERNAME-mbp ~ % cp -r cifar-10-batches-bin /Users/<USERNAME>/AndroidStudioProjects/DemoCIFAR10/app/src/main/assets
-    ```
-    **Note:** The example code can be run with the following command:
-    ```bash
-    python3 main.py --model-path cifar10_model.pth --pte-model-path cifar10_model_pte_only.pte --split-pte-model-path cifar10_model.pte --save-pt-json cifar10_pt.json --save-et-json cifar10_et.json --ptd-model-dir . --epochs 10 --fine-tune-epochs 50
+    cp train_data.bin test_data.bin ./app/src/main/assets/cifar-10-batches-bin/
     ```
 
-7. Edit the `build.gradle.kts` file inside the [app](./app) directory to have [this](./app/build.gradle.kts) content:
-
-8. Create the `ImageTransformations.kt` object file inside the [java/com/example/democifar10](./app/src/main/java/com/example/democifar10/) directory as shown here:
-    ![ImageTransformations](./images/Pasted%20image%2020250709165757.png)
-
-- Content for the `ImageTransformations.kt` file can be found [here](app/src/main/java/com/example/democifar10/ImageTransformations.kt).
-
-9. Create the `Cifar10ImageExtractor.kt` class file in the [java/com/example/democifar10](./app/src/main/java/com/example/democifar10) directory![](./images/Pasted%20image%2020250709170006.png)
-
-- Content for the `Cifar10ImageExtractor.kt` class can be found [here](./app/src/main/java/com/example/democifar10/Cifar10ImageExtractor.kt).
-
-10. Copy the assets generated in during the execution of the [CIFAR 10 example](https://github.com/pytorch/executorch/tree/main/extension/training/examples/CIFAR) into the assets directory using the following commands:
+10. Copy the other assets generated in the [Prerequisites](#prerequisites) section into the [assets](./app/src/main/assets) directory using the following commands:
 
     ```bash
-    (base) USERNAME@USERNAME-mbp ~ % cp generic_cifar.ptd /Users/<USERNAME>/AndroidStudioProjects/DemoCIFAR10/app/src/main/assets
-
-    (base) USERNAME@USERNAME-mbp ~ % cp generic_cifar.pte /Users/<USERNAME>/AndroidStudioProjects/DemoCIFAR10/app/src/main/assets
-
-    (base) USERNAME@USERNAME-mbp ~ % cp executorch.aar /Users/<USERNAME>/AndroidStudioProjects/DemoCIFAR10/app/libs
+    cp generic_cifar.ptd generic_cifar.pte ./app/src/main/assets
+    cp executorch.aar ./app/libs
     ```
-
-11. Finally edit the `MainActivity.kt` file with the code from [here](./app/src/main/java/com/example/democifar10/MainActivity.kt):
 
 12. Sync your Gradle build: ![](./images/Pasted%20image%2020250709170528.png)
 
