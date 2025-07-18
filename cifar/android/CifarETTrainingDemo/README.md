@@ -79,14 +79,14 @@ Refer to this example for the [CIFAR 10 example](https://github.com/pytorch/exec
 4. Copy the binary files (`train_data.bin` and `test_data.bin`) generated during the execution of the CIFAR 10 example from the [Prerequisites](#prerequisites) section into this [directory](./app/src/main/assets/cifar-10-batches-bin) using the following command:
 
     ```bash
-    cp train_data.bin test_data.bin ./app/src/main/assets/cifar-10-batches-bin/
+    $ cp train_data.bin test_data.bin ./app/src/main/assets/cifar-10-batches-bin/
     ```
 
 10. Copy the other assets generated in the [Prerequisites](#prerequisites) section into the [assets](./app/src/main/assets) directory using the following commands:
 
     ```bash
-    cp generic_cifar.ptd generic_cifar.pte ./app/src/main/assets
-    cp executorch.aar ./app/libs
+    $ cp generic_cifar.ptd generic_cifar.pte ./app/src/main/assets
+    $ cp executorch.aar ./app/libs
     ```
 
 12. Sync your Gradle build: ![](./images/Pasted%20image%2020250709170528.png)

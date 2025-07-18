@@ -83,7 +83,7 @@ class MainActivity : ComponentActivity() {
         return bitmap
     }
 
-    // Function to save a bitmap to a PNG file
+    // Save a bitmap to a PNG file
     private fun saveBitmapToPng(bitmap: Bitmap, file: File) {
         try {
             FileOutputStream(file).use { out ->
@@ -281,7 +281,7 @@ class MainActivity : ComponentActivity() {
             debugTag, "Loaded ${tstImgData?.size?.div(pixelsPerImage) ?: 0} testing images"
         )
 
-        // Get a batch of 4 images from the test image and labels data for testing
+        // Get a batch of images from the test image and labels data for testing
         val imgData = tstImgData?.take(batchSize * height * width * channels)
         val lblData = tstLblData?.take(batchSize)
 
@@ -453,7 +453,7 @@ class MainActivity : ComponentActivity() {
             val lblData = tstLblData.slice(lblStartIdx until lblEndIdx)
 
             // Apply test transformations to the evaluation data
-            // This includes normalization but no data augmentation
+            // which includes normalization but no data augmentation
             val transformedData = ImageTransformations.applyBatchTestTransformations(
                 imgData.toByteArray(), batchSize, width, height, channels
             )
@@ -542,7 +542,7 @@ class MainActivity : ComponentActivity() {
 
         val statusText = findViewById<TextView>(R.id.statusText)
 
-        // Make sure we're on the UI thread
+        // Setting operation on the UI thread
         runOnUiThread {
             try {
                 statusText.text = "Training: Starting Epoch 1/$epochs"
@@ -557,7 +557,7 @@ class MainActivity : ComponentActivity() {
         val tot_train_samples = trnImgData.size / pixelsPerImage
         val num_batches = tot_train_samples / batchSize
 
-        // Create a list of indices that we'll shuffle for each epoch
+        // Create a list of indices which we'll shuffle for each epoch
         val indices = (0 until tot_train_samples).toMutableList()
 
         for (epoch in 1..epochs) {
@@ -611,7 +611,7 @@ class MainActivity : ComponentActivity() {
                 val lblData = batchLblData
 
                 // Apply data augmentation transformations to the training data
-                // This includes padding, random crop, horizontal flip, and normalization
+                // which includes padding, random crop, horizontal flip, and normalization
                 val transformedData = ImageTransformations.applyBatchTransformations(
                     imgData, batchSize, width, height, channels
                 )
@@ -670,7 +670,6 @@ class MainActivity : ComponentActivity() {
             )
 
             // Evaluate the model using the test data and the evaluateModel function
-            // Pass false for updateUI to prevent nested UI updates
             val val_accuracy = evaluateModel(model, tstImgData, tstLblData, batchSize, 1000, false)
 
             // Update UI with epoch results

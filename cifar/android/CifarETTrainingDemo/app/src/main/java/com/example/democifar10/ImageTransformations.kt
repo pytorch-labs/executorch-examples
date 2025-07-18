@@ -40,7 +40,7 @@ object ImageTransformations {
     }
 
     /**
-     * Apply test transformations to images (no data augmentation)
+     * Apply test transformations to images with no data augmentation
      * Only converts to float and applies normalization
      *
      * @param imageData Raw image data in bytes (CHW format)
@@ -55,7 +55,7 @@ object ImageTransformations {
         // Convert byte array to float array (0-255)
         val floatData = imageData.map { it.toUByte().toFloat() }.toFloatArray()
 
-        // Apply only normalization (no data augmentation)
+        // Apply only normalization only
         val normalizedData = normalize(
             floatData,
             mean = floatArrayOf(0.4914f, 0.4822f, 0.4465f),
@@ -82,7 +82,7 @@ object ImageTransformations {
         val paddedHeight = height + 2 * padding
         val paddedData = FloatArray(channels * paddedWidth * paddedHeight)
 
-        // Initialize with zeros (black padding)
+        // Initialize with zeros
         paddedData.fill(0f)
 
         // Copy the original image to the center of the padded image
