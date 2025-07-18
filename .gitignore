@@ -8,6 +8,7 @@ build/
 *.bin
 *.model
 *.pte
+*.ptd
 
 # Xcode
 xcuserdata/
@@ -15,3 +16,20 @@ xcuserdata/
 .swiftpm/
 *.xcworkspace/
 *.xcframework/
+*.iml
+
+.gradle
+/local.properties
+./idea
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+*.aar
