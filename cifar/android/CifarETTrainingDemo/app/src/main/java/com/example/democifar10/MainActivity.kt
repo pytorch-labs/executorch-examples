@@ -249,7 +249,7 @@ class MainActivity : ComponentActivity() {
         arrayOf("plane", "car", "bird", "cat", "deer", "dog", "frog", "horse", "ship", "truck")
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        val batchSize = 1
+        val batchSize = 4
         val width = 32
         val height = 32
         val channels = 3
@@ -282,14 +282,22 @@ class MainActivity : ComponentActivity() {
         )
 
         // Get a batch of images from the test image and labels data for testing
-        val imgData = tstImgData?.take(batchSize * height * width * channels)
-        val lblData = tstLblData?.take(batchSize)
+        val imgData = tstImgData?.take(batchSize * height * width * channels)?.toByteArray()
+        val lblData = tstLblData?.take(batchSize)?.toByteArray()
+
+        // Check if image data is available
+        if (imgData == null || imgData.isEmpty()) {
+            Log.e(debugTag, "Error: Test image data is null or empty")
+            val errorTextView: TextView = findViewById(R.id.resultTextView)
+            errorTextView.text = "Error: Could not load test data"
+            return
+        }
 
         // Create a direct ByteBuffer as required by Tensor.fromBlob
-        val buffer = Tensor.allocateFloatBuffer(imgData?.size ?: 0)
+        val buffer = Tensor.allocateFloatBuffer(imgData.size)
         // Convert ByteArray to FloatArray with proper normalization (0-255 -> 0-1)
-        val floatArray = FloatArray(imgData?.size ?: 0)
-        imgData?.forEachIndexed { index, byte ->
+        val floatArray = FloatArray(imgData.size)
+        imgData.forEachIndexed { index, byte ->
             floatArray[index] = (byte.toInt() and 0xFF) / 255.0f
         }
         buffer.put(floatArray)
@@ -310,7 +318,15 @@ class MainActivity : ComponentActivity() {
             imageDir.mkdir()
         }
 
-        val batchTestLabelBuffer = LongArray(batchSize) { lblData?.get(it.toInt())?.toLong() ?: 0 }
+        // Check if label data is available
+        if (lblData == null || lblData.isEmpty()) {
+            Log.e(debugTag, "Error: Test label data is null or empty")
+            val errorTextView: TextView = findViewById(R.id.resultTextView)
+            errorTextView.text = "Error: Could not load test labels"
+            return
+        }
+
+        val batchTestLabelBuffer = LongArray(batchSize) { lblData[it].toLong() }
 
 
         val testLabelBuffer = Tensor.fromBlob(

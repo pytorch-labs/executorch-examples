@@ -6,18 +6,21 @@ In this tutorial, we will be fine-tuning a CIFAR 10 model on an android app usin
 
 ### Android Environment Setup
 
-For the android environment setup, follow these steps:
+Ensure that your development environment meets the following requirements:
 
-1. Make sure that you have [OpenJDK](https://openjdk.org/) installed and configured on your machine.
-2. Download and install the latest version of [Android Studio](https://developer.android.com/studio/)  .
-3. Start Android Studio and open the **Settings** dialog (gear icon on the bottom left).
-4. Navigate to **Languages & Frameworks**, then **Android SDK**.
-5. In the **SDK Platforms** tab, check **Android 14.0 (“UpsideDownCake”)** and **Android API 36**.
-6. In the **SDK Tools** tab, check **Android SDK Build-Tools 36**, **NDK (Side by side)**, **Android SDK Command-line Tools (latest)**, **CMake**, **Android Emulator**, and **Android SDK Platform-Tools**.
-7. Ensure the following environment variables are set:
-    - `JAVA_HOME`
-    - `ANDROID_NDK`
-    - `ANDROID_SDK`
+1. Minimum CMake version: `CMake 3.22` or higher
+2. Minimum JDK version: 17
+3. Target Android API level: 34 (`Android 14.0`)
+4. Required Android SDK components:
+   - Android SDK Build-Tools 34
+   - Android SDK Platform-Tools
+   - Android NDK (Side by side)
+   - Android SDK Command-line Tools (latest)
+5. Install Android Emulator or connect an Android device
+6. Ensure the following environment variables are set:
+   - `JAVA_HOME`
+   - `ANDROID_NDK`
+   - `ANDROID_SDK`
 
 **NOTE** For the updated steps for building the dependencies refer to the official repository over [here](https://github.com/pytorch/executorch/blob/main/extension/android/README.md).
 
