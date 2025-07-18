@@ -62,6 +62,8 @@ If you run into errors for sdk path, complete the above steps in the [Trouble Sh
 
 1. Start with a clone of this repository and open the project in Android Studio.
 
+    **NOTE:** The build configuration in the file `executorch-examples/cifar/android/CifarETTrainingDemo/app/build.gradle.kts`.
+
 2. Set the minimum SDK version to `API 34`.
 
 3. Wait for the Gradle sync to complete.
