@@ -19,7 +19,6 @@ import java.io.IOException
 
 /**
  * Instrumented tests for CIFAR-10 ExecuTorch Training Demo App.
- * These tests will execute on an Android device.
  */
 @RunWith(AndroidJUnit4::class)
 class CifarETTrainingDemoTest {

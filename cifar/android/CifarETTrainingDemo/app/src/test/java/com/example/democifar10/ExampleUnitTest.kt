@@ -6,7 +6,6 @@ import kotlin.random.Random
 
 /**
  * Unit tests for CIFAR-10 ExecuTorch Training Demo App.
- * These tests run on the local machine (JVM) and test pure logic without Android dependencies.
  */
 class CifarETTrainingDemoUnitTest {
 
@@ -23,7 +22,7 @@ class CifarETTrainingDemoUnitTest {
             "plane", "car", "bird", "cat", "deer", "dog", "frog", "horse", "ship", "truck"
         )
 
-        // CIFAR-10 normalization constants (ImageNet-like values commonly used for CIFAR-10)
+        // CIFAR-10 normalization constants
         private val CIFAR_MEAN = floatArrayOf(0.4914f, 0.4822f, 0.4465f)
         private val CIFAR_STD = floatArrayOf(0.2023f, 0.1994f, 0.2010f)
     }
@@ -129,7 +128,7 @@ class CifarETTrainingDemoUnitTest {
     @Test
     fun testDataTypeConversions() {
         // Test byte to unsigned byte conversion
-        val testByte: Byte = -1 // This is 255 as unsigned
+        val testByte: Byte = -1
         val unsignedValue = testByte.toUByte().toFloat()
         assertEquals("Byte -1 should convert to 255.0f", 255.0f, unsignedValue, 0.001f)
 

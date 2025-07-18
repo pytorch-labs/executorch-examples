@@ -250,6 +250,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val batchSize = 4
+        val numEpochs = 5
         val width = 32
         val height = 32
         val channels = 3
@@ -406,7 +407,7 @@ class MainActivity : ComponentActivity() {
 
             // Start fine-tuning
             trainModel(
-                tModule!!, trnImgData!!, trnLblData!!, tstImgData!!, tstLblData!!, 5, batchSize
+                tModule!!, trnImgData!!, trnLblData!!, tstImgData!!, tstLblData!!, numEpochs, batchSize
             )
         }
 
@@ -422,7 +423,7 @@ class MainActivity : ComponentActivity() {
         tstLblData: ByteArray,
         batchSize: Int,
         maxImagesToEvaluate: Int = 8000,
-        updateUI: Boolean = true // Add parameter to control UI updates
+        updateUI: Boolean = true
     ): Double {
         val width = 32
         val height = 32
