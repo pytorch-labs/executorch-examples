@@ -33,43 +33,30 @@ To install ExecuTorch in a `uv` Python environment use the following commands:
 ```bash
 $ git clone https://github.com/pytorch/executorch.git --recurse-submodules
 $ cd executorch
+
+# [optional] Setup an environment
 $ uv venv --seed --prompt et --python 3.10
 $ source .venv/bin/activate
-$ git fetch origin
-$ git submodule sync --recursive
-$ git submodule update --init --recursive
+
+# Install build tools and ExecuTorch pip wheel
 $ ./install_executorch.sh
+
+# Build ExecuTorch for Android. Output AAR: ./extension/android/executorch_android/build/outputs/aar/executorch_android-debug.aar
 $ ./scripts/build_android_library.sh
+
+# Fetch the examples
+$ git clone git@github.com:pytorch-labs/executorch-examples.git
+
+# Copy the ExecuTorch AAR into the libs directory
+$ mkdir -p executorch-examples/cifar/android/CifarETTrainingDemo/app/libs
+$ cp ./extension/android/executorch_android/build/outputs/aar/executorch_android-debug.aar executorch-examples/cifar/android/CifarETTrainingDemo/app/libs/executorch.aar
+
+# Build the data and models
+$ mkdir -p executorch-examples/cifar/android/CifarETTrainingDemo/app/src/main/assets/
+$ python ./extension/training/examples/CIFAR/main.py --data-dir executorch-examples/cifar/android/CifarETTrainingDemo/app/src/main/assets/ --model-path executorch-examples/cifar/android/CifarETTrainingDemo/app/src/main/assets/cifar10_model.pth --pte-model-path executorch-examples/cifar/android/CifarETTrainingDemo/app/src/main/assets/cifar10_model.pte --split-pte-model-path executorch-examples/cifar/android/CifarETTrainingDemo/app/src/main/assets/cifar10_model_pte_only.pte --save-pt-json executorch-examples/cifar/android/CifarETTrainingDemo/app/src/main/assets/cifar10_pt.json --save-et-json executorch-examples/cifar/android/CifarETTrainingDemo/app/src/main/assets/cifar10_et.json --ptd-model-dir executorch-examples/cifar/android/CifarETTrainingDemo/app/src/main/assets/ --epochs 5 --fine-tune-epochs 10
 ```
 
-If you run into errors for sdk path, complete the above steps in the [Trouble Shooting](#trouble-shooting) section before proceeding with the following steps:
-
-```bash
-$ sh ./scripts/build_android_library.sh
-$ sh ./extension/android/executorch_android/android_test_setup.sh
-$ ls ./extension/android/executorch_android/
-$ cd extension/android
-$ ./gradlew :executorch_android:testDebugUnitTest
-$ ./gradlew :executorch_android:connectedAndroidTest
-```
-
-**NOTE:** This fails without a connected android device. If you run into this issue, launch your emulator or connect the android device to your laptop.
-
-```bash
-$ ./gradlew :executorch_android:connectedAndroidTest
-```
-
-Finally, the `.aar` file can be found here:
-
-```bash
-<PARENT_DIRECTORY>/executorch/extension/android/executorch_android/build/outputs/aar/executorch_android-debug.aar
-```
-
-**Note:** We will rename this file to `executorch.aar` and copy it into the `libs` directory of the android app.
-
-## Prerequisites
-
-Refer to this example for the [CIFAR 10 example](https://github.com/pytorch/executorch/tree/main/extension/training/examples/CIFAR) on the official ExecuTorch repository to generate the binary files (`train_data.bin` and `test_data.bin`) and the model files (`generic_cifar.ptd` and `generic_cifar.pte`) required for this tutorial.
+If you run into errors for sdk path, complete the above steps in the [Trouble Shooting](#trouble-shooting) section before proceeding.
 
 ## Creation of Android App
 
@@ -79,28 +66,9 @@ Refer to this example for the [CIFAR 10 example](https://github.com/pytorch/exec
 
 3. Wait for the Gradle sync to complete.
 
-4. Copy the binary files (`train_data.bin` and `test_data.bin`) generated during the execution of the CIFAR 10 example from the [Prerequisites](#prerequisites) section into this [directory](./app/src/main/assets/cifar-10-batches-bin) using the following command:
+4. Click on run to proceed: ![](./images/Pasted%20image%2020250709170837.png)
 
-    ```bash
-    $ cp train_data.bin test_data.bin ./app/src/main/assets/cifar-10-batches-bin/
-    ```
-
-10. Copy the other assets generated in the [Prerequisites](#prerequisites) section into the [assets](./app/src/main/assets) directory using the following commands:
-
-    ```bash
-    $ cp generic_cifar.ptd generic_cifar.pte ./app/src/main/assets
-    $ cp executorch.aar ./app/libs
-    ```
-
-12. Sync your Gradle build: ![](./images/Pasted%20image%2020250709170528.png)
-
-
-- You'll be notified that the build was successful: ![](./images/Pasted%20image%2020250709171142.png)
-
-
-13. Click on run to proceed: ![](./images/Pasted%20image%2020250709170837.png)
-
-14. Click on the fine-tune button and the training begins for `150` epochs![[Pasted image 20250709171210.png]]
+5. Click on the fine-tune button and the training begins for `150` epochs![[Pasted image 20250709171210.png]]
 
     **Note:** The training parameters can be tweaked in `MainActivity.kt`
 
@@ -134,12 +102,13 @@ We reached a training loss of `1.7837489886283875`, training accuracy of `35%`, 
 Check if the `local.properties` file is present in the `extension/android` directory:
 
 ```bash
-$ cat <PARENT_DIRECTORY>/executorch/extension/android/local.properties
+$ cat ./extension/android/local.properties
 ```
 
 **NOTE:** If this file (`local.properties`) is missing, the build process will fail because the script can't retrieve the path for the android sdk from the env variables. If you encounter this issue, please follow the following steps:
 
 ```bash
-$ touch <PARENT_DIRECTORY>/executorch/extension/android/local.properties
-$ vim <PARENT_DIRECTORY>/executorch/extension/android/local.properties # Add the path to your sdk directory into this file like: sdk.dir=/Users/<USERNAME>/Library/Android/sdk
+$ touch ./extension/android/local.properties
+$ vim ./extension/android/local.properties
+# Add the path to your sdk directory into this file like: sdk.dir=/Users/<USERNAME>/Library/Android/sdk
 ```
