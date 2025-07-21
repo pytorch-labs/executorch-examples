@@ -8,16 +8,15 @@ In this tutorial, we will be fine-tuning a CIFAR 10 model on an android app usin
 
 Ensure that your development environment meets the following requirements:
 
-1. Minimum CMake version: `CMake 3.22` or higher
-2. Minimum JDK version: 17
-3. Target Android API level: 34 (`Android 14.0`)
-4. Required Android SDK components:
+1. Minimum JDK version: 17
+2. Target Android API level: 34 (`Android 14.0`)
+3. Required Android SDK components:
    - Android SDK Build-Tools 34
    - Android SDK Platform-Tools
    - Android NDK (Side by side)
    - Android SDK Command-line Tools (latest)
-5. Install Android Emulator or connect an Android device
-6. Ensure the following environment variables are set:
+4. Install Android Emulator or connect an Android device
+5. Ensure the following environment variables are set:
    - `JAVA_HOME`
    - `ANDROID_NDK`
    - `ANDROID_SDK`
@@ -60,9 +59,7 @@ If you run into errors for sdk path, complete the above steps in the [Trouble Sh
 
 ## Creation of Android App
 
-1. Start with a clone of this repository and open the project in Android Studio.
-
-    **NOTE:** The build configuration in the file `executorch-examples/cifar/android/CifarETTrainingDemo/app/build.gradle.kts`.
+1. Start with a clone of this repository and open the project in Android Studio executorch-examples/cifar/android/CifarETTrainingDemo/app/build.gradle.kts.
 
 2. Set the minimum SDK version to `API 34`.
 
