@@ -29,7 +29,7 @@ adb shell am start -W -S -n org.pytorch.executorchexamples.dl3/.MainActivity
 ```
 
 ### On Android Studio
-Open Android Studio and open the project path `dl3/android/DeepLanV3Demo`. Wait for gradle sync to complete.
+Open Android Studio and open the project path `dl3/android/DeepLabV3Demo`. Wait for gradle sync to complete.
 Then simply press "Run app" button (Control + r) to run the app either on physical device / emulator.
 
 ## Step 4: Push the model to the phone or emulator
