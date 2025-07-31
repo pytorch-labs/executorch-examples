@@ -5,10 +5,21 @@ This demo showcases the capabilities of ExecuTorch's JavaScript bindings. It is 
 ## Prerequisites
 
 - [Emscripten](https://emscripten.org/docs/getting_started/Tutorial.html)
+  - Refer to the [Wasm example Readme](https://github.com/pytorch/executorch/blob/main/examples/wasm/README.md) for a quick setup guide.
 
 ## Building and Running
 
 ```
+# Clone executorch submodule
+git submodule update --init
+
+# Set up Executorch
+cd executorch
+./install_executorch.sh
+./install_executorch.sh --clean
+
+cd ..
+
 # Build the demo
 bash build.sh
 
