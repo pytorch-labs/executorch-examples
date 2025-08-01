@@ -2,23 +2,48 @@
 
 This demo showcases the capabilities of ExecuTorch's JavaScript bindings. It is able to load a model, run inference, and classify an image natively in the browser.
 
-## Prerequisites
+## Installing Emscripten
 
-- [Emscripten](https://emscripten.org/docs/getting_started/Tutorial.html)
-  - Refer to the [Wasm example Readme](https://github.com/pytorch/executorch/blob/main/examples/wasm/README.md) for a quick setup guide.
+[Emscripten](https://emscripten.org/index.html) is necessary to compile ExecuTorch for Wasm. You can install Emscripten with these commands:
+
+```bash
+# Clone the emsdk repository
+git clone https://github.com/emscripten-core/emsdk.git
+cd emsdk
+
+# Download and install version 4.0.10 of the SDK
+./emsdk install 4.0.10
+./emsdk activate 4.0.10
+
+# Add the Emscripten environment variables to your shell
+source ./emsdk_env.sh
+```
+
+## Setting up ExecuTorch and Generating the Model File
+
+1. Clone the ExecuTorch submodule
+```bash
+git submodule update --init executorch
+```
+
+2. Following the setup guide in [Setting up ExecuTorch](https://pytorch.org/executorch/main/getting-started-setup)
+you should be able to get the basic development environment for ExecuTorch working.
+
+3. Using the script `portable/scripts/export.py` generate the MobileNetV2 binary file for this demo.
+
+```bash
+cd executorch # To the root of the executorch repo
+
+# Export the model file for the demo
+python3 -m examples.portable.scripts.export --model_name="mv2"
+```
 
 ## Building and Running
 
-```
-# Clone executorch submodule
-git submodule update --init
+Once you have Emscripten installed, ExecuTorch set up, and the model file generated, you can build and run the demo.
 
-# Set up Executorch
-cd executorch
-./install_executorch.sh
-./install_executorch.sh --clean
-
-cd ..
+```bash
+cd mv2/wasm # The directory containing this README
 
 # Build the demo
 bash build.sh
@@ -32,6 +57,6 @@ The page will be available at http://localhost:8000/demo.html.
 ## Demo Features
 
 - Load a model from a file
-  - It currently only supports the MobileNetv2 model. Passing in a model with different input/output shapes will result in an error.
-  - You can generate the model file by following the instructions in the [Portable Mode Readme](https://github.com/pytorch/executorch/blob/main/examples/portable/README.md).
+  - It currently only supports the MobileNetV2 model. Passing in a model with different input/output shapes will result in an error.
 - Run inference on an image
+  - Supported formats: `.png`, `.gif`, `.jpeg`, `.jpg`
