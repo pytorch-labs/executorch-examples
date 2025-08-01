@@ -21,15 +21,19 @@ source ./emsdk_env.sh
 
 ## Setting up ExecuTorch and Generating the Model File
 
-1. Clone the ExecuTorch submodule
+Make sure you have the system requirements listed in the [Getting Started Guide](https://docs.pytorch.org/executorch/main/getting-started.html#system-requirements) before continuing.
+
+1. Install ExecuTorch from PyPI.
 ```bash
-git submodule update --init executorch
+pip3 install executorch
 ```
 
-2. Following the setup guide in [Setting up ExecuTorch](https://pytorch.org/executorch/main/getting-started-setup)
-you should be able to get the basic development environment for ExecuTorch working.
+2. Update the ExecuTorch submodule.
+```bash
+git submodule update --init --recursive executorch
+```
 
-3. Using the script `portable/scripts/export.py` generate the MobileNetV2 binary file for this demo.
+3. Using the script `examples/portable/scripts/export.py` generate the MobileNetV2 binary file for this demo.
 
 ```bash
 cd executorch # To the root of the executorch repo
