@@ -9,6 +9,13 @@ PTD files are used to store data outside of the PTE file. Some use-cases:
 - Deduplication: sharing model weights between multiple executable PTE files. This can significantly reduce binary file size and runtime memory usage.
 - Flexible deployment: allow async updates between program and data, especially if they are updated with different cadences.
 
+## LoRA
+A major use-case that program-data separation enables is inference with multiple LoRA adapters. LoRA is a fine-tuning technique introduced in [LoRA: Low-Rank Adaptation of Large Language Models](https://arxiv.org/abs/2106.09685). LoRA fine-tuning produces lightweight 'adapter' weights that can be applied to an existing model to adapt it to a new task. LoRA adapters are typically small in comparison to LLM foundation weights. They are generally on the order of KB,MB, depending on the finetuning setup and model size.
+
+With program-data separation, users can generate a PTE file containing the program and LoRA weights, and save the original foundation weights to a separate PTD file. Provided they are based on the same underlying model, multiple LoRA-adapted PTE files can share the same foundation weights. This means adding a model adapted to a new task incurs minimal binary size and runtime memory overhead; the cost of the lora adapter weights.
+
+An example of this usage is coming soon.
+
 ## Virtual environment setup
 Create and activate a Python virtual environment:
 ```bash
