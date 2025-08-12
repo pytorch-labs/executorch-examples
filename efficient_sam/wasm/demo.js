@@ -13,6 +13,7 @@ let modelButton = null;
 let imageButton = null;
 let inference_button = null
 let maskButton = null;
+let etdumpButton = null;
 let canvasCtx = null;
 let maskCanvas = null;
 let maskCanvasCtx = null;
@@ -45,6 +46,9 @@ var Module = {
     pointerCanvasCtx = pointerCanvas.getContext("2d");
 
     modelText = document.getElementById("model_text");
+
+    etdumpButton = document.getElementById("etdump_button");
+    etdumpButton.addEventListener("click", etdump);
   }
 }
 const et = Module;
@@ -52,6 +56,24 @@ const et = Module;
 let module = null;
 let imageTensor = null;
 let point = null;
+
+function etdump() {
+  if (module == null) {
+    return;
+  }
+
+  const etdump = module.etdump();
+  const blob = new Blob([etdump.buffer], { type: "application/octet-stream" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "result.etdump";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  etdump.delete();
+}
 
 function toggleMask(event) {
   if (maskCanvas.style.display === "none") {
@@ -221,6 +243,7 @@ function loadModelFile(file) {
       modelText.style.color = null;
       canvasCtx.clearRect(0, 0, DIMS, DIMS);
       upload_image_button.disabled = false;
+      etdumpButton.disabled = false;
     }
   };
   reader.readAsArrayBuffer(file);

@@ -33,14 +33,12 @@ pip3 install executorch
 git submodule update --init --recursive executorch
 ```
 
-3. Using the script `examples/portable/scripts/export.py` generate the EfficientSAM binary file for this demo.
+3. Generate the EfficientSAM binary file for this demo.
 
 ```bash
-cd executorch # To the root of the executorch repo
-
-# Export the model file for the demo
-python3 -m examples.portable.scripts.export --model_name="efficient_sam"
+bash export.sh
 ```
+It should output a file called `xnnpack_efficient_sam.pte`.
 
 ## Building and Running
 
@@ -65,5 +63,5 @@ The page will be available at http://localhost:8000/demo.html.
 - Run inference on an image
   - Supported formats: `.png`, `.gif`, `.jpeg`, `.jpg`
 - Select a point on the image to run inference
-  - May take up to 40 seconds to run inference
+  - May take around 6.5 seconds to run inference
 - Show and hide the segmentation mask
