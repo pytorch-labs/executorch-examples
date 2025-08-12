@@ -60,3 +60,17 @@ Multiple LoRA-adapted PTE files can share the same foundation weights and adding
 
 ### Requirements
 LoRA is currently supported on executorch main. [Please install ExecuTorch pip package from source](https://docs.pytorch.org/executorch/stable/using-executorch-building-from-source.html#install-executorch-pip-package-from-source), until executorch==1.0 is released.
+
+### Export LoRA files
+
+```bash
+bash export_lora.sh
+```
+
+This will output 4 files:
+- llama_3_2_1B.pte
+- llama_3_2_1B.ptd
+- llama_3_2_1B_lora.pte
+- foundation_weights.ptd
+
+llama_3_2_1B.ptd and foundation_weights.ptd should contain the same contents, and you can remove llama_3_2_1B.ptd.
