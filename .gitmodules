@@ -11,3 +11,7 @@
 [submodule "mv2/wasm/executorch"]
 	path = mv2/wasm/executorch
 	url = https://github.com/pytorch/executorch.git
+
+[submodule "efficient_sam/wasm/executorch"]
+	path = efficient_sam/wasm/executorch
+	url = https://github.com/pytorch/executorch.git
