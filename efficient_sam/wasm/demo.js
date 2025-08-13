@@ -11,7 +11,7 @@ const DIMS = 1024;
 
 let modelButton = null;
 let imageButton = null;
-let inference_button = null
+let inferenceButton = null
 let maskButton = null;
 let etdumpButton = null;
 let canvasCtx = null;
