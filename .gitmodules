@@ -15,3 +15,7 @@
 [submodule "efficient_sam/wasm/executorch"]
 	path = efficient_sam/wasm/executorch
 	url = https://github.com/pytorch/executorch.git
+
+[submodule "stories110M/wasm/executorch"]
+	path = stories110M/wasm/executorch
+	url = https://github.com/pytorch/executorch.git
