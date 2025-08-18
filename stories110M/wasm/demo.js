@@ -15,14 +15,18 @@ let inferenceButton = null
 let etdumpButton = null;
 let modelText = null;
 let tokenizerText = null;
+let warningText = null;
 let promptBox = null;
 let temperatureSlider = null;
+let tokenCountSlider = null;
 
 let tokenizer = null;
+let tk = null;
+
 var Module = {
   onRuntimeInitialized: function() {
-    loadTokenizer().then(tk => {
-      tokenizer = new tk.SPTokenizer();
+    loadTokenizer().then(tkmodule => {
+      tk = tkmodule;
 
       modelButton = document.getElementById("upload_model_button");
       modelButton.addEventListener("click", openFilePickerModel);
@@ -35,6 +39,7 @@ var Module = {
 
       modelText = document.getElementById("model_text");
       tokenizerText = document.getElementById("tokenizer_text");
+      warningText = document.getElementById("warning_text");
       promptBox = document.getElementById("prompt");
 
       etdumpButton = document.getElementById("etdump_button");
@@ -44,6 +49,12 @@ var Module = {
       const temperatureText = document.getElementById("temperature_text");
       temperatureSlider.oninput = function() {
         temperatureText.textContent = "Temperature: " + (temperatureSlider.value / 10).toFixed(1);
+      }
+
+      tokenCountSlider = document.getElementById("token_count_slider");
+      const tokenCountText = document.getElementById("token_count_text");
+      tokenCountSlider.oninput = function() {
+        tokenCountText.textContent = "Tokens to generate: " + tokenCountSlider.value;
       }
     });
   }
@@ -99,11 +110,16 @@ function sampleNextToken(logits, temperature) {
     return probs.length - 1;
 }
 
-async function* generateTokens(tokens, bos, temperature) {
-  for (let kvInd = 0n; kvInd < 10n; kvInd++) {
+async function* generateTokens(tokens, bos, temperature, count) {
+  warningText.textContent = "";
+  for (let kvInd = 0n; kvInd < count; kvInd++) {
     const input1 = et.Tensor.fromArray([1, tokens.length], tokens);
     const input2 = et.Tensor.fromArray([1], [0n]);
 
+    if (tokens.length > modelMaxContentLength) {
+      warningText.textContent = "Max token length exceeded";
+      return;
+    }
     const startTime = performance.now();
     const output = module.forward([input1, input2]);
     const endTime = performance.now();
@@ -117,7 +133,8 @@ async function* generateTokens(tokens, bos, temperature) {
     }
 
     if (token == bos) {
-      break;
+      warningText.textContent = "BOS token generated";
+      return;
     }
 
     const str = tokenizer.decode(tokens[tokens.length - 1], token);
@@ -136,27 +153,41 @@ async function runModel(event) {
   const tokens = tokenizer.encode(text, 0, 0);
   const bos = tokenizer.bosTok;
   const temperature = temperatureSlider.value / 10;
+  const count = tokenCountSlider.value;
 
   if (tokens.length == 0) {
     return;
   }
 
   promptBox.disabled = true;
+  modelButton.disabled = true;
+  tokenizerButton.disabled = true;
   inferenceButton.disabled = true;
+  etdumpButton.disabled = true;
   temperatureSlider.disabled = true;
+  tokenCountSlider.disabled = true;
 
   try {
-    for await (const str of generateTokens(tokens, bos, temperature)) {
+    for await (const str of generateTokens(tokens, bos, temperature, count)) {
       text += str;
       promptBox.value = text;
       await new Promise(resolve => setTimeout(resolve, 100));
     }
   } finally {
     promptBox.disabled = false;
+    modelButton.disabled = false;
+    tokenizerButton.disabled = false;
     inferenceButton.disabled = false;
+    etdumpButton.disabled = false;
     temperatureSlider.disabled = false;
+    tokenCountSlider.disabled = false;
   }
 }
+
+let modelBos = null;
+let modelEos = null;
+let modelVocabSize = null;
+let modelMaxContentLength = null;
 
 function verifyModel(mod) {
   try {
@@ -167,9 +198,42 @@ function verifyModel(mod) {
     return false;
   }
 
-  const methodMeta = mod.getMethodMeta("forward");
-  console.log(mod.getMethods());
-  console.log(methodMeta);
+  try {
+    modelBos = mod.execute("get_bos_id", [])[0];
+    console.log("get_bos_id: " + modelBos);
+  } catch (e) {
+    modelText.textContent = "Failed to execute get_bos_id method: " + e;
+    modelText.style.color = "red";
+    return false;
+  }
+
+  try {
+    modelEos = mod.execute("get_eos_ids", [])[0];
+    console.log("get_eos_ids: " + modelEos);
+  } catch (e) {
+    modelText.textContent = "Failed to execute get_eos_ids method: " + e;
+    modelText.style.color = "red";
+    return false;
+  }
+
+  try {
+    modelVocabSize = mod.execute("get_vocab_size", [])[0];
+    console.log("get_vocab_size: " + modelVocabSize);
+  } catch (e) {
+    modelText.textContent = "Failed to execute get_vocab_size method: " + e;
+    modelText.style.color = "red";
+    return false;
+  }
+
+  try {
+    modelMaxContentLength = mod.execute("get_max_context_len", [])[0];
+    console.log("get_max_content_len: " + modelMaxContentLength);
+  } catch (e) {
+    modelText.textContent = "Failed to execute get_max_content_len method: " + e;
+    modelText.style.color = "red";
+    return false;
+  }
+
   return true;
 }
 
@@ -188,9 +252,11 @@ function loadModelFile(file) {
       modelText.textContent = 'Uploaded model: ' + file.name;
       modelText.style.color = null;
 
-      if (tokenizer.isLoaded) {
-        inferenceButton.disabled = false;
-      }
+      tokenizerText.textContent = 'No tokenizer uploaded';
+      tokenizerText.style.color = null;
+
+      tokenizerButton.disabled = false;
+      inferenceButton.disabled = true;
       etdumpButton.disabled = false;
     }
   };
@@ -219,21 +285,49 @@ async function openFilePickerModel() {
   }
 }
 
+function verifyTokenizer(buffer) {
+  try {
+    if (tokenizer != null) {
+      tokenizer.delete();
+    }
+    tokenizer = new tk.SPTokenizer();
+    tokenizer.load(buffer);
+  } catch (e) {
+    tokenizerText.textContent = "Failed to load tokenizer: " + e;
+    tokenizerText.style.color = "red";
+    return false;
+  }
+
+  if (tokenizer.bosTok != modelBos) {
+    tokenizerText.textContent = "BOS token mismatch: " + tokenizer.bosTok + " != " + modelBos;
+    tokenizerText.style.color = "red";
+    return false;
+  }
+
+  if (tokenizer.eosTok != modelEos) {
+    tokenizerText.textContent = "EOS token mismatch: " + tokenizer.eosTok + " != " + modelEos
+    tokenizerText.style.color = "red";
+    return false;
+  }
+
+  console.log("bosTok: " + tokenizer.bosTok);
+  console.log("eosTok: " + tokenizer.eosTok);
+  console.log("vocabSize: " + tokenizer.vocabSize);
+  return true;
+}
+
 function loadTokenizerFile(file) {
   const reader = new FileReader();
   reader.onload = function(event) {
     const buffer = event.target.result;
-    tokenizer.load(buffer);
 
-    console.log("BOS: " + tokenizer.bosTok);
-    console.log("EOS: " + tokenizer.eosTok);
-    console.log("Vocab size: " + tokenizer.vocabSize);
+    if (verifyTokenizer(buffer)) {
+      tokenizerText.textContent = 'Uploaded tokenizer: ' + file.name;
+      tokenizerText.style.color = null;
 
-    tokenizerText.textContent = 'Uploaded tokenizer: ' + file.name;
-    tokenizerText.style.color = null;
-
-    if (module != null) {
-      inferenceButton.disabled = false;
+      if (module != null) {
+        inferenceButton.disabled = false;
+      }
     }
   };
   reader.readAsArrayBuffer(file);
