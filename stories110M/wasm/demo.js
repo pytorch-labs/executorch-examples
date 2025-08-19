@@ -114,14 +114,14 @@ async function* generateTokens(tokens, bos, temperature, count) {
   warningText.textContent = "";
   for (let kvInd = 0n; kvInd < count; kvInd++) {
     const input1 = et.Tensor.fromArray([1, tokens.length], tokens);
-    const input2 = et.Tensor.fromArray([1], [0n]);
+    const input2 = modelUseKvCache ? et.Tensor.fromArray([1], [0n]) : null;
 
-    if (tokens.length > modelMaxContentLength) {
+    if (tokens.length > modelMaxContentLength - (modelUseKvCache ? 0n : 1n)) {
       warningText.textContent = "Max token length exceeded";
       return;
     }
     const startTime = performance.now();
-    const output = module.forward([input1, input2]);
+    const output = modelUseKvCache ? module.forward([input1, input2]) : module.forward(input1);
     const endTime = performance.now();
     console.log(((endTime - startTime)/1000).toFixed(2) + "s");
 
@@ -141,7 +141,8 @@ async function* generateTokens(tokens, bos, temperature, count) {
     tokens.push(BigInt(token));
 
     input1.delete();
-    input2.delete();
+    if (modelUseKvCache)
+      input2.delete();
     output[0].delete();
 
     yield str;
@@ -188,6 +189,7 @@ let modelBos = null;
 let modelEos = null;
 let modelVocabSize = null;
 let modelMaxContentLength = null;
+let modelUseKvCache = null;
 
 function verifyModel(mod) {
   try {
@@ -234,6 +236,15 @@ function verifyModel(mod) {
     return false;
   }
 
+  try {
+    modelUseKvCache = mod.execute("use_kv_cache", [])[0];
+    console.log("use_kv_cache: " + modelUseKvCache);
+  } catch (e) {
+    modelText.textContent = "Failed to execute use_kv_cache method: " + e;
+    modelText.style.color = "red";
+    return false;
+  }
+
   return true;
 }
 
@@ -259,6 +270,10 @@ function loadModelFile(file) {
       inferenceButton.disabled = true;
       etdumpButton.disabled = false;
     }
+  };
+  reader.onerror = function(event) {
+    modelText.textContent = 'Failed to load model: ' + event.target.error;
+    modelText.style.color = "red";
   };
   reader.readAsArrayBuffer(file);
 }
@@ -329,6 +344,10 @@ function loadTokenizerFile(file) {
         inferenceButton.disabled = false;
       }
     }
+  };
+  reader.onerror = function(event) {
+    tokenizerText.textContent = 'Failed to load tokenizer: ' + event.target.error;
+    tokenizerText.style.color = "red";
   };
   reader.readAsArrayBuffer(file);
 }
