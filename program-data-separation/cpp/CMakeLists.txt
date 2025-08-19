@@ -17,7 +17,7 @@ option(EXECUTORCH_BUILD_XNNPACK "" ON)
 # Add ExecuTorch subdirectory
 add_subdirectory("executorch")
 
-set(DEMO_SOURCES main.cpp)
+set(DEMO_SOURCES linear_example/main.cpp)
 
 # Create executable
 add_executable(executorch_program_data_separation ${DEMO_SOURCES})
