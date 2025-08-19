@@ -66,4 +66,5 @@ The page will be available at http://localhost:8000/demo.html.
 - Tokens to generate slider ranging from 1 to 100.
 - Generate tokens in a text box to tell a short story.
   - Display the generated tokens in a table.
-  - Each token may take up to 500ms to generate depending on the length of the prompt.
+  - Prefill latency is ~4ms per token.
+  - Decode latency is ~23ms.

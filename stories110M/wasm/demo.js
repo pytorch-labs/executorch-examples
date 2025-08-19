@@ -110,20 +110,27 @@ function sampleNextToken(logits, temperature) {
     return probs.length - 1;
 }
 
-async function* generateTokens(tokens, bos, temperature, count) {
+async function* generateTokens(prompt, bos, temperature, count) {
   warningText.textContent = "";
+  const prefillStartTime = performance.now();
+  const tokens = tokenizer.encode(prompt, 0, 0);
+  let lastToken = null;
   for (let kvInd = 0n; kvInd < count; kvInd++) {
-    const input1 = et.Tensor.fromArray([1, tokens.length], tokens);
-    const input2 = modelUseKvCache ? et.Tensor.fromArray([1], [0n]) : null;
+    const input1 = kvInd > 0 && modelUseKvCache ? et.Tensor.fromArray([1, 1], [lastToken]): et.Tensor.fromArray([1, tokens.length], tokens);
+    const input2 = modelUseKvCache ? et.Tensor.fromArray([1], [kvInd]) : null;
 
     if (tokens.length > modelMaxContentLength - (modelUseKvCache ? 0n : 1n)) {
       warningText.textContent = "Max token length exceeded";
       return;
     }
-    const startTime = performance.now();
+    const decodeStartTime = performance.now();
     const output = modelUseKvCache ? module.forward([input1, input2]) : module.forward(input1);
     const endTime = performance.now();
-    console.log(((endTime - startTime)/1000).toFixed(2) + "s");
+    if (kvInd == 0) {
+      console.log("Prefill time: " + (endTime - prefillStartTime) + "ms");
+    } else {
+      console.log("Decode time: " + (endTime - decodeStartTime) + "ms");
+    }
 
     let token = 0;
     if (temperature == 0) {
@@ -138,7 +145,11 @@ async function* generateTokens(tokens, bos, temperature, count) {
     }
 
     const str = tokenizer.decode(tokens[tokens.length - 1], token);
-    tokens.push(BigInt(token));
+    if (modelUseKvCache) {
+      lastToken = BigInt(token);
+    } else {
+      tokens.push(BigInt(token));
+    }
 
     input1.delete();
     if (modelUseKvCache)
@@ -150,13 +161,12 @@ async function* generateTokens(tokens, bos, temperature, count) {
 }
 
 async function runModel(event) {
-  let text = promptBox.value;
-  const tokens = tokenizer.encode(text, 0, 0);
+  let prompt = promptBox.value;
   const bos = tokenizer.bosTok;
   const temperature = temperatureSlider.value / 10;
   const count = tokenCountSlider.value;
 
-  if (tokens.length == 0) {
+  if (prompt.length == 0) {
     return;
   }
 
@@ -169,10 +179,10 @@ async function runModel(event) {
   tokenCountSlider.disabled = true;
 
   try {
-    for await (const str of generateTokens(tokens, bos, temperature, count)) {
-      text += str;
-      promptBox.value = text;
-      await new Promise(resolve => setTimeout(resolve, 100));
+    for await (const str of generateTokens(prompt, bos, temperature, count)) {
+      prompt += str;
+      promptBox.value = prompt;
+      await new Promise(resolve => setTimeout(resolve, 20));
     }
   } finally {
     promptBox.disabled = false;
