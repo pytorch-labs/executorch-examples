@@ -1,0 +1,29 @@
+<!--
+  Copyright (c) Meta Platforms, Inc. and affiliates.
+  All rights reserved.
+  This source code is licensed under the BSD-style license found in the
+  LICENSE file in the root directory of this source tree.
+-->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Executorch Wasm Demo</title>
+</head>
+<body>
+    <button type="button" id="upload_model_button">Upload pte file</button>
+    <button disabled type="button" id="upload_image_button">Upload image file</button>
+    <button disabled type="button" id="inference_button">Run model</button>
+    <button disabled type="button" id="mask_button">Show mask</button>
+    <button disabled type="button" id="etdump_button">Download etdump</button>
+    <p id="model_text">No model uploaded</p>
+    <div id="canvas-container" style="position: relative;">
+        <canvas id="canvas" width="1024" height="1024" style="position: absolute; left: 0; top: 0; z-index: 0;"></canvas>
+        <canvas id="mask_canvas" width="1024" height="1024" style="position: absolute; left: 0; top: 0; z-index: 1;"></canvas>
+        <canvas id="pointer_canvas" width="1024" height="1024" style="position: absolute; left: 0; top: 0; z-index: 2;"></canvas>
+    </div>
+    <script src="demo.js"></script>
+    <script src="executorch_wasm_demo_lib.js"></script>
+</body>
+</html>
