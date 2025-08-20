@@ -76,7 +76,9 @@ sh build_example.sh
 ```
 
 ## Run the executable.
-```
+```bash
+cd ~/executorch-examples/program-data-separation/cpp/lora_example
+
 ./build/bin/executorch_program_data_separation --lora_model_path=../../llama_3_2_1B_lora.pte --llama_model_path=../../llama_3_2_1B.pte --tokenizer_path=../../tokenizer.model --data_path=../../foundation.ptd
 ```
 
