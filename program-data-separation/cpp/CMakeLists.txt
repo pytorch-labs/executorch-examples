@@ -41,8 +41,6 @@ if(EXECUTORCH_BUILD_LINEAR_DEMO)
 endif()
 if(EXECUTORCH_BUILD_LORA_DEMO)
   list(APPEND DEMO_SOURCES "lora_example/main.cpp")
-  add_subdirectory("executorch/examples/models/llama/runner")
-  list(APPEND LINK_LIBS llama_runner)
 endif()
 
 # Create executable

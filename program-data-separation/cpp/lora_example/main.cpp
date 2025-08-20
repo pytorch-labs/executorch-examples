@@ -6,9 +6,18 @@
  * LICENSE file in the root directory of this source tree.
  * @lint-ignore-every CLANGTIDY facebook-hte-Deprecated
  */
+
+#include <memory>
+#include <string>
+#include <vector>
+
 #include <gflags/gflags.h>
 
-#include <executorch/examples/models/llama/runner/runner.h>
+#include <executorch/extension/llm/runner/llm_runner_helper.h>
+#include <executorch/extension/llm/runner/stats.h>
+#include <executorch/extension/llm/runner/text_llm_runner.h>
+#include <executorch/extension/llm/runner/text_prefiller.h>
+#include <executorch/extension/llm/runner/text_token_generator.h>
 
 #if defined(ET_USE_THREADPOOL)
 #include <executorch/extension/threadpool/cpuinfo_utils.h>
@@ -36,7 +45,30 @@ DEFINE_int32(
     "max_seq_len. If the number of input tokens + seq_len > max_seq_len, the "
     "output will be truncated to max_seq_len tokens.");
 
-using namespace ::executorch::extension;
+using executorch::extension::Module;
+using executorch::runtime::Error;
+namespace llm = executorch::extension::llm;
+
+namespace {
+static constexpr int32_t kSpecialTokensSize = 256;
+static inline std::unique_ptr<std::vector<std::string>>
+_get_default_special_tokens() {
+  auto special_tokens =
+      std::make_unique<std::vector<std::string>>(std::vector<std::string>{
+          "<|begin_of_text|>", "<|end_of_text|>",
+          "<|reserved_special_token_0|>", "<|reserved_special_token_1|>",
+          "<|finetune_right_pad_id|>", "<|step_id|>", "<|start_header_id|>",
+          "<|end_header_id|>", "<|eom_id|>", "<|eot_id|>", "<|python_tag|>"});
+  // pad the rest of the special tokens with reserved tokens
+  ssize_t reserved_special_token_num = 2;
+  while (special_tokens->size() < kSpecialTokensSize) {
+    special_tokens->emplace_back("<|reserved_special_token_" +
+                                 std::to_string(reserved_special_token_num++) +
+                                 "|>");
+  }
+  return special_tokens;
+}
+} // namespace
 
 int main(int argc, char *argv[]) {
   ET_LOG(Info, "Running program-data separation lora example...");
@@ -53,37 +85,41 @@ int main(int argc, char *argv[]) {
   int32_t seq_len = 128;
   int32_t cpu_threads = -1;
 
-  // Create runner for lora model.
-  std::unique_ptr<::executorch::extension::llm::TextLLMRunner> lora_runner =
-      example::create_llama_runner(lora_model_path, tokenizer_path, data_path);
-  if (lora_runner == nullptr) {
-    ET_LOG(Error, "Failed to create lora_runner.");
+  // Create tokenizers.
+  std::unique_ptr<tokenizers::Tokenizer> tokenizer1 =
+      llm::load_tokenizer(tokenizer_path, _get_default_special_tokens());
+  std::unique_ptr<tokenizers::Tokenizer> tokenizer2 =
+      llm::load_tokenizer(tokenizer_path, _get_default_special_tokens());
+
+  if (tokenizer1 == nullptr || tokenizer2 == nullptr) {
+    ET_LOG(Info,
+           "Failed to load %s as a Tiktoken, Sentencepiece or Llama2.c "
+           "tokenizer, make sure the artifact is one of these types",
+           tokenizer_path);
     return 1;
   }
 
-  // create runner for llama model
-  std::unique_ptr<::executorch::extension::llm::TextLLMRunner> llama_runner =
-      example::create_llama_runner(llama_model_path, tokenizer_path, data_path);
-  if (llama_runner == nullptr) {
-    ET_LOG(Error, "Failed to create llama_runner.");
-    return 1;
-  }
+  // Create runners.
+  std::unique_ptr<llm::TextLLMRunner> llama_runner =
+      llm::create_text_llm_runner(llama_model_path, std::move(tokenizer1),
+                                  data_path, temperature);
+  std::unique_ptr<llm::TextLLMRunner> lora_runner = llm::create_text_llm_runner(
+      lora_model_path, std::move(tokenizer2), data_path, temperature);
 
-  // generate
-  executorch::extension::llm::GenerationConfig config{
-      .seq_len = seq_len, .temperature = temperature};
+  // Generate.
+  llm::GenerationConfig config{.seq_len = seq_len, .temperature = temperature};
 
-  auto error = lora_runner->generate(prompt, config);
-  if (error != executorch::runtime::Error::Ok) {
-    ET_LOG(Error, "Failed to generate with lora_runner, error code %zu.",
+  ET_LOG(Info, "Generating with llama...");
+  auto error = llama_runner->generate(prompt, config);
+  if (error != Error::Ok) {
+    ET_LOG(Error, "Failed to generate with llama_runner, error code %zu.",
            error);
     return 1;
   }
 
-  ET_LOG(Info, "Generating with llama...");
-  error = llama_runner->generate(prompt, config);
-  if (error != executorch::runtime::Error::Ok) {
-    ET_LOG(Error, "Failed to generate with llama_runner, error code %zu.",
+  error = lora_runner->generate(prompt, config);
+  if (error != Error::Ok) {
+    ET_LOG(Error, "Failed to generate with lora_runner, error code %zu.",
            error);
     return 1;
   }
