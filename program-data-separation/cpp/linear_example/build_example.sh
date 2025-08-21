@@ -7,7 +7,7 @@ mkdir -p build
 cd build
 
 # Configure CMake
-cmake -DCMAKE_BUILD_TYPE=Release -DEXECUTORCH_BUILD_LINEAR_DEMO=True  ../..
+cmake -DCMAKE_BUILD_TYPE=Release ../..
 
 # Build the project
 cmake --build . -j$(nproc)
