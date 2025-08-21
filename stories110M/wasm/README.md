@@ -4,20 +4,7 @@ This demo showcases the capabilities of ExecuTorch's JavaScript bindings. It is 
 
 ## Installing Emscripten
 
-[Emscripten](https://emscripten.org/index.html) is necessary to compile ExecuTorch for Wasm. You can install Emscripten with these commands:
-
-```bash
-# Clone the emsdk repository
-git clone https://github.com/emscripten-core/emsdk.git
-cd emsdk
-
-# Download and install version 4.0.10 of the SDK
-./emsdk install 4.0.10
-./emsdk activate 4.0.10
-
-# Add the Emscripten environment variables to your shell
-source ./emsdk_env.sh
-```
+[Emscripten](https://emscripten.org/index.html) is necessary to compile ExecuTorch for Wasm.
 
 ## Setting up ExecuTorch and Generating the Model File
 
@@ -66,5 +53,5 @@ The page will be available at http://localhost:8000/demo.html.
 - Tokens to generate slider ranging from 1 to 100.
 - Generate tokens in a text box to tell a short story.
   - Display the generated tokens in a table.
-  - Prefill latency is ~4ms per token.
+  - Prefill latency is ~22ms per token.
   - Decode latency is ~23ms.

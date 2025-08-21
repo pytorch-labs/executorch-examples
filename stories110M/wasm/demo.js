@@ -6,9 +6,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-const DIMS = 1024;
-
-
 let modelButton = null;
 let tokenizerButton = null;
 let inferenceButton = null
@@ -85,12 +82,12 @@ function etdump() {
 
 function sampleNextToken(logits, temperature) {
     if (temperature <= 0) {
-        throw new Error("Temperature must be > 0");
+        return BigInt(logits.reduce((iMax, elem, i, arr) => elem > arr[iMax] ? i : iMax, 0));
     }
     // Convert logits to a regular array for easier manipulation
     const arr = Array.from(logits);
     // For numerical stability, subtract the max logit before exponentiating
-    const maxLogit = Math.max(...arr);
+    const maxLogit = arr.reduce((a, b) => Math.max(a, b), -Infinity);
     const scaled = arr.map(x => (x - maxLogit) / temperature);
     // Compute exponentials
     const exp = scaled.map(Math.exp);
@@ -103,60 +100,110 @@ function sampleNextToken(logits, temperature) {
     for (let i = 0; i < probs.length; i++) {
         cumSum += probs[i];
         if (r < cumSum) {
-            return i;
+            return BigInt(i);
         }
     }
     // Fallback: return last index (shouldn't happen unless numerical issues)
-    return probs.length - 1;
+    return BigInt(probs.length - 1);
 }
 
 async function* generateTokens(prompt, bos, temperature, count) {
   warningText.textContent = "";
   const prefillStartTime = performance.now();
-  const tokens = tokenizer.encode(prompt, 0, 0);
-  let lastToken = null;
-  for (let kvInd = 0n; kvInd < count; kvInd++) {
-    const input1 = kvInd > 0 && modelUseKvCache ? et.Tensor.fromArray([1, 1], [lastToken]): et.Tensor.fromArray([1, tokens.length], tokens);
-    const input2 = modelUseKvCache ? et.Tensor.fromArray([1], [kvInd]) : null;
+  const tokens = tokenizer.encode(prompt, 0, 1);
 
-    if (tokens.length > modelMaxContentLength - (modelUseKvCache ? 0n : 1n)) {
-      warningText.textContent = "Max token length exceeded";
-      return;
-    }
-    const decodeStartTime = performance.now();
-    const output = modelUseKvCache ? module.forward([input1, input2]) : module.forward(input1);
-    const endTime = performance.now();
-    if (kvInd == 0) {
-      console.log("Prefill time: " + (endTime - prefillStartTime) + "ms");
-    } else {
-      console.log("Decode time: " + (endTime - decodeStartTime) + "ms");
-    }
+  if (tokens.length >= modelMaxContentLength) {
+    warningText.textContent = "Max token length exceeded";
+    return;
+  }
 
-    let token = 0;
-    if (temperature == 0) {
-      token = output[0].data.reduce((iMax, elem, i, arr) => elem > arr[iMax] ? i : iMax, 0);
-    } else {
-      token = sampleNextToken(output[0].data, temperature);
-    }
+  if (modelUseKvCache) {
+    // Prefill stage
+    let kvInd = 0n;
+    let lastToken = null;
 
-    if (token == bos) {
+    const prefillStartTime = performance.now();
+    tokens.forEach(token => {
+      const input1 = et.Tensor.fromArray([1, 1], [token]);
+      const input2 = et.Tensor.fromArray([1], [kvInd]);
+
+      const output = module.forward([input1, input2]);
+      lastToken = sampleNextToken(output[0].data, temperature);
+
+      input1.delete();
+      input2.delete();
+      output[0].delete();
+      kvInd++;
+    });
+    const prefillEndTime = performance.now();
+    const dtime = prefillEndTime - prefillStartTime;
+    console.log("Prefill time: " + dtime + "ms (" + (dtime / tokens.length) + " ms/token)");
+
+    if (lastToken == bos) {
       warningText.textContent = "BOS token generated";
       return;
     }
 
-    const str = tokenizer.decode(tokens[tokens.length - 1], token);
-    if (modelUseKvCache) {
-      lastToken = BigInt(token);
-    } else {
-      tokens.push(BigInt(token));
-    }
+    yield tokenizer.decode(lastToken, lastToken);
 
-    input1.delete();
-    if (modelUseKvCache)
+    // Decode stage
+    for (let i = 1; i < count; i++) {
+      if (kvInd >= modelMaxContentLength) {
+        warningText.textContent = "Max token length exceeded";
+        return;
+      }
+
+      const input1 = et.Tensor.fromArray([1, 1], [lastToken]);
+      const input2 = et.Tensor.fromArray([1], [kvInd]);
+
+      const decodeStartTime = performance.now();
+      const output = module.forward([input1, input2]);
+      const endTime = performance.now();
+      console.log("Decode time: " + (endTime - decodeStartTime) + "ms");
+
+      let currToken = sampleNextToken(output[0].data, temperature)
+
+      input1.delete();
       input2.delete();
-    output[0].delete();
+      output[0].delete();
 
-    yield str;
+      if (currToken == bos) {
+        warningText.textContent = "BOS token generated";
+        return;
+      }
+
+      yield tokenizer.decode(lastToken, currToken);
+      lastToken = currToken;
+      kvInd++;
+    }
+  } else {
+    for (let i = 0; i < count; i++) {
+      const input1 = et.Tensor.fromArray([1, tokens.length], tokens);
+
+      if (tokens.length >= modelMaxContentLength) {
+        warningText.textContent = "Max token length exceeded";
+        return;
+      }
+      const startTime = performance.now();
+      const output = module.forward(input1);
+      const endTime = performance.now();
+      console.log("Time to generate: " + (endTime - startTime) + "ms");
+
+      let token = sampleNextToken(output[0].data, temperature);
+
+      if (token == bos) {
+        warningText.textContent = "BOS token generated";
+        return;
+      }
+
+      const str = tokenizer.decode(tokens[tokens.length - 1], token);
+      tokens.push(BigInt(token));
+
+      input1.delete();
+      output[0].delete();
+
+      yield str;
+    }
   }
 }
 
@@ -365,12 +412,6 @@ function loadTokenizerFile(file) {
 async function openFilePickerTokenizer() {
   try {
     const [fileHandle] = await window.showOpenFilePicker({
-      types: [{
-        description: 'Tokenizer Files',
-        accept: {
-          'application/octet-stream': ['.model'],
-        },
-      }],
       multiple: false, // Set to true for multiple file selection
     });
     const file = await fileHandle.getFile();
