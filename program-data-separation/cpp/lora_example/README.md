@@ -1,7 +1,20 @@
-# ExecuTorch Program Data Separation Demo C++.
+# ExecuTorch LoRA Demo
 
-This directory contains the C++ code to run the examples generated in [program-data-separation](../program-data-separation/README.md).
+This directory contains the C++ code for the LoRA demo. This demo showcases how to export and run models that share the same architecture without inflating binary file size or runtime memory.
 
+Specifically, this demo walks through exporting and running a LoRA and non-LoRA llama model without duplication of shared foundation weights on disk or in memory.
+
+1. Exporting LoRA and non-LoRA llama models, lowered to XNNPACK, with weights in a separate file.
+2. Loading and running models with weights in a separate file.
+3. Runtime weight sharing via XNNPACK.
+
+## Size savings.
+
+Size results will vary depending on the model, quantization and LoRA config. For this demo, we save ~5GB of disk space by storing weights in a separate, sharable file and ~5GB runtime memory by sharing weights at runtime through the XNNPACK weight cache. Detailed results are below.
+
+### XNNPACK weight sharing.
+
+The XNNPACK backend is a singleton. Weight sharing is implemented via the XNNPACK weight cache. At delegate init time, XNNPACK checks the weight cache for the weights it needs. If they don't exist, XNNPACK will fetch weights from the NamedDataMap (the API that exposes weights in a PTD file), pack them, store them in the weight cache and free the original. This means we won't keep around multiple copies of the same weights.
 
 ## Virtual environment setup.
 Create and activate a Python virtual environment:
@@ -46,7 +59,19 @@ tokenizer.model is copied from the temp directory where we downloaded the HF art
 
 Note:
 - PTE: contains the program execution logic.
-- PTD: contains the constant tensors used by the PTE.
+- PTD: contains the constant tensors used by the PTE. This format is similar to safetensors, but relying on flatbuffer instead of json for serde.
+
+Sample file sizes:
+```
+-rw-r--r-- 1 lfq users 4943000480 Aug 11 15:55 foundation.ptd
+-rw-r--r-- 1 lfq users 1078636416 Aug 11 15:55 llama_3_2_1B_lora.pte
+-rw-r--r-- 1 lfq users 1051324736 Aug 11 15:53 llama_3_2_1B.pte
+```
+
+Notice the lora - llama file size difference is about 27.3MB. This will change depending on the LoRA config. This demo is using the config from https://huggingface.co/lucylq/llama3_1B_lora/blob/main/adapter_config.json
+```
+{"r": 64, "lora_alpha": 128, "target_modules": ["q_proj", "v_proj", "o_proj"], "peft_type": "LORA", "base_model_name_or_path": "meta-llama/Llama-3.2-1B-Instruct"}
+```
 
 ## Install runtime dependencies.
 The ExecuTorch repository is configured as a git submodule at `~/executorch-examples/program-data-separation/cpp/executorch`.  To initialize it:
@@ -55,7 +80,7 @@ cd ~/executorch-examples/
 git submodule sync
 git submodule update --init --recursive
 ```
-Install dev requirements for ExecuTorch
+Install dev requirements for ExecuTorch:
 
 ```bash
 cd ~/executorch-examples/program-data-separation/cpp/executorch
@@ -79,10 +104,27 @@ sh build_example.sh
 ```bash
 cd ~/executorch-examples/program-data-separation/cpp/lora_example
 
-./build/bin/executorch_program_data_separation --lora_model_path=../../llama_3_2_1B_lora.pte --llama_model_path=../../llama_3_2_1B.pte --tokenizer_path=../../tokenizer.model --data_path=../../foundation.ptd
+./build/bin/executorch_program_data_separation --lora_model_path=../../llama_3_2_1B_lora.pte --llama_model_path=../../llama_3_2_1B.pte --tokenizer_path=../../tokenizer.model --foundation_weights_path=../../foundation.ptd
 ```
 
+You should see some logs showing the Resident Set Size (RSS) at various points of the execution. Some sample logs may look like this:
+
+```
+Generating with llama...
+RSS after loading model: 7886.125000 MiB
+RSS after prompt prefill: 7886.125000 MiB
+RSS after finishing text generation: 7886.125000 MiB
+
+Generating with lora...
+RSS after loading model: 7933.523438 MiB
+RSS after prompt prefill: 7933.523438 MiB
+RSS after finishing text generation: 7933.523438 MiB
+```
+Notice the memory increase of ~47 MiB from running llama model to running lora model. You can see the difference without weight-sharing by removing the flag `-DEXECUTORCH_XNNPACK_ENABLE_WEIGHT_CACHE=True` from `build_example.sh`.
+
 ## Clean up.
+```bash
 rm -rf build
 cd ~/executorch-examples/program-data-separation
 rm -rf *.pte *.ptd tokenizer.model
+```

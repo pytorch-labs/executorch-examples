@@ -28,8 +28,8 @@ DEFINE_string(lora_model_path, "llama_3_2_1B_lora.pte",
               "LoRA model serialized in flatbuffer format.");
 DEFINE_string(llama_model_path, "llama_3_2_1B.pte",
               "Model serialized in flatbuffer format.");
-DEFINE_string(data_path, "foundation.ptd",
-              "Data serialized in flatbuffer format.");
+DEFINE_string(foundation_weights_path, "foundation.ptd",
+              "Foundation weights serialized in flatbuffer format.");
 
 DEFINE_string(tokenizer_path, "tokenizer.model", "Tokenizer stuff.");
 
@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
 
   const char *lora_model_path = FLAGS_lora_model_path.c_str();
   const char *llama_model_path = FLAGS_llama_model_path.c_str();
-  const char *data_path = FLAGS_data_path.c_str();
+  const char *foundation_weights_path = FLAGS_foundation_weights_path.c_str();
 
   const char *tokenizer_path = FLAGS_tokenizer_path.c_str();
   const char *prompt = FLAGS_prompt.c_str();
@@ -102,9 +102,10 @@ int main(int argc, char *argv[]) {
   // Create runners.
   std::unique_ptr<llm::TextLLMRunner> llama_runner =
       llm::create_text_llm_runner(llama_model_path, std::move(tokenizer1),
-                                  data_path, temperature);
-  std::unique_ptr<llm::TextLLMRunner> lora_runner = llm::create_text_llm_runner(
-      lora_model_path, std::move(tokenizer2), data_path, temperature);
+                                  foundation_weights_path, temperature);
+  std::unique_ptr<llm::TextLLMRunner> lora_runner =
+      llm::create_text_llm_runner(lora_model_path, std::move(tokenizer2),
+                                  foundation_weights_path, temperature);
 
   // Generate.
   llm::GenerationConfig config{.seq_len = seq_len, .temperature = temperature};
