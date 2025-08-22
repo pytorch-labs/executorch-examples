@@ -46,11 +46,10 @@ The page will be available at http://localhost:8000/demo.html.
 ## Demo Features
 
 - Load a model and tokenizer configuration from a file.
-  - Your browser cannot load models that are too big. The demo is configured to load the stories110M model.
-  - The EOS token, BOS token, and vocab size of the tokenizer must match the model.
-  - Only SentencePiece tokenizers are currently supported.
+  - The demo is configured to load the stories110M model.
+  - Larger models may fail to upload or run out of memory.
 - Temperature slider ranging from 0.0 to 2.0.
-- Tokens to generate slider ranging from 1 to 100.
+- Tokens to generate slider ranging from 1 to max context length - 1.
 - Generate tokens in a text box to tell a short story.
   - Display the generated tokens in a table.
   - Prefill latency is ~22ms per token.

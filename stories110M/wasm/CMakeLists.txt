@@ -11,25 +11,21 @@
 add_subdirectory("executorch")
 
 # Tokenizer
-if(NOT EXECUTORCH_ROOT)
-  set(EXECUTORCH_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/executorch)
-endif()
-
-include(${EXECUTORCH_ROOT}/tools/cmake/Utils.cmake)
-set(_common_compile_options -Wno-deprecated-declarations -fPIC -Wall -Werror)
-set(_common_include_directories ${EXECUTORCH_ROOT}/..)
-
-add_executable(tokenizer_js ${CMAKE_CURRENT_SOURCE_DIR}/sentencepiece_js.cpp)
+add_executable(tokenizer_js)
 
 target_compile_options(tokenizer_js PRIVATE ${_common_compile_options})
 target_include_directories(tokenizer_js PRIVATE ${_common_include_directories})
 
 target_include_directories(tokenizer_js PRIVATE ${_common_include_directories})
 
-target_link_libraries(tokenizer_js PRIVATE tokenizers::tokenizers embind)
+target_link_libraries(tokenizer_js PRIVATE tokenizers_wasm tokenizers::regex_lookahead)
 target_link_options(
   tokenizer_js PRIVATE -sALLOW_MEMORY_GROWTH
-  -sMODULARIZE=1 -sEXPORT_NAME=loadTokenizer -sENVIRONMENT=web)
+  -sMODULARIZE=1 -sEXPORT_NAME=loadTokenizers -sENVIRONMENT=web)
+
+set_target_properties(
+  tokenizer_js PROPERTIES OUTPUT_NAME "tokenizers"
+)
 
 
 # Bindings

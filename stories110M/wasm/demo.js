@@ -12,6 +12,7 @@ let inferenceButton = null
 let etdumpButton = null;
 let modelText = null;
 let tokenizerText = null;
+let tokenizerWarningText = null;
 let warningText = null;
 let promptBox = null;
 let temperatureSlider = null;
@@ -21,39 +22,38 @@ let tokenizer = null;
 let tk = null;
 
 var Module = {
-  onRuntimeInitialized: function() {
-    loadTokenizer().then(tkmodule => {
-      tk = tkmodule;
+  onRuntimeInitialized: async function() {
+    tk = await loadTokenizers();
 
-      modelButton = document.getElementById("upload_model_button");
-      modelButton.addEventListener("click", openFilePickerModel);
+    modelButton = document.getElementById("upload_model_button");
+    modelButton.addEventListener("click", openFilePickerModel);
 
-      tokenizerButton = document.getElementById("upload_tokenizer_button");
-      tokenizerButton.addEventListener("click", openFilePickerTokenizer);
+    tokenizerButton = document.getElementById("upload_tokenizer_button");
+    tokenizerButton.addEventListener("click", openFilePickerTokenizer);
 
-      inferenceButton = document.getElementById("inference_button");
-      inferenceButton.addEventListener("click", runModel);
+    inferenceButton = document.getElementById("inference_button");
+    inferenceButton.addEventListener("click", runModel);
 
-      modelText = document.getElementById("model_text");
-      tokenizerText = document.getElementById("tokenizer_text");
-      warningText = document.getElementById("warning_text");
-      promptBox = document.getElementById("prompt");
+    modelText = document.getElementById("model_text");
+    tokenizerText = document.getElementById("tokenizer_text");
+    tokenizerWarningText = document.getElementById("tokenizer_warning_text");
+    warningText = document.getElementById("warning_text");
+    promptBox = document.getElementById("prompt");
 
-      etdumpButton = document.getElementById("etdump_button");
-      etdumpButton.addEventListener("click", etdump);
+    etdumpButton = document.getElementById("etdump_button");
+    etdumpButton.addEventListener("click", etdump);
 
-      temperatureSlider = document.getElementById("temperature_slider");
-      const temperatureText = document.getElementById("temperature_text");
-      temperatureSlider.oninput = function() {
-        temperatureText.textContent = "Temperature: " + (temperatureSlider.value / 10).toFixed(1);
-      }
+    temperatureSlider = document.getElementById("temperature_slider");
+    const temperatureText = document.getElementById("temperature_text");
+    temperatureSlider.oninput = function() {
+      temperatureText.textContent = "Temperature: " + (temperatureSlider.value / 10).toFixed(1);
+    }
 
-      tokenCountSlider = document.getElementById("token_count_slider");
-      const tokenCountText = document.getElementById("token_count_text");
-      tokenCountSlider.oninput = function() {
-        tokenCountText.textContent = "Tokens to generate: " + tokenCountSlider.value;
-      }
-    });
+    tokenCountSlider = document.getElementById("token_count_slider");
+    const tokenCountText = document.getElementById("token_count_text");
+    tokenCountSlider.oninput = function() {
+      tokenCountText.textContent = "Tokens to generate: " + tokenCountSlider.value;
+    }
   }
 }
 const et = Module;
@@ -110,7 +110,7 @@ function sampleNextToken(logits, temperature) {
 async function* generateTokens(prompt, bos, temperature, count) {
   warningText.textContent = "";
   const prefillStartTime = performance.now();
-  const tokens = tokenizer.encode(prompt, 0, 1);
+  const tokens = tokenizer.encode(prompt, 0, 0);
 
   if (tokens.length >= modelMaxContentLength) {
     warningText.textContent = "Max token length exceeded";
@@ -125,7 +125,7 @@ async function* generateTokens(prompt, bos, temperature, count) {
     const prefillStartTime = performance.now();
     tokens.forEach(token => {
       const input1 = et.Tensor.fromArray([1, 1], [token]);
-      const input2 = et.Tensor.fromArray([1], [kvInd]);
+      const input2 = et.Tensor.fromArray([1], [kvInd++]);
 
       const output = module.forward([input1, input2]);
       lastToken = sampleNextToken(output[0].data, temperature);
@@ -133,7 +133,6 @@ async function* generateTokens(prompt, bos, temperature, count) {
       input1.delete();
       input2.delete();
       output[0].delete();
-      kvInd++;
     });
     const prefillEndTime = performance.now();
     const dtime = prefillEndTime - prefillStartTime;
@@ -154,7 +153,7 @@ async function* generateTokens(prompt, bos, temperature, count) {
       }
 
       const input1 = et.Tensor.fromArray([1, 1], [lastToken]);
-      const input2 = et.Tensor.fromArray([1], [kvInd]);
+      const input2 = et.Tensor.fromArray([1], [kvInd++]);
 
       const decodeStartTime = performance.now();
       const output = module.forward([input1, input2]);
@@ -174,7 +173,6 @@ async function* generateTokens(prompt, bos, temperature, count) {
 
       yield tokenizer.decode(lastToken, currToken);
       lastToken = currToken;
-      kvInd++;
     }
   } else {
     for (let i = 0; i < count; i++) {
@@ -308,14 +306,20 @@ function verifyModel(mod) {
 function loadModelFile(file) {
   const reader = new FileReader();
   reader.onload = function(event) {
+    tokenCountSlider.disabled = true;
+    tokenizerButton.disabled = true;
+    inferenceButton.disabled = true;
+    etdumpButton.disabled = true;
+    if (module != null) {
+      module.delete();
+      module = null;
+    }
+
     const buffer = event.target.result;
 
     const mod = et.Module.load(buffer);
 
     if (verifyModel(mod)) {
-      if (module != null) {
-        module.delete();
-      }
       module = mod;
       modelText.textContent = 'Uploaded model: ' + file.name;
       modelText.style.color = null;
@@ -323,9 +327,12 @@ function loadModelFile(file) {
       tokenizerText.textContent = 'No tokenizer uploaded';
       tokenizerText.style.color = null;
 
+      tokenCountSlider.disabled = false;
       tokenizerButton.disabled = false;
       inferenceButton.disabled = true;
       etdumpButton.disabled = false;
+
+      tokenCountSlider.max = Number(modelMaxContentLength) - 1;
     }
   };
   reader.onerror = function(event) {
@@ -357,27 +364,32 @@ async function openFilePickerModel() {
   }
 }
 
-function verifyTokenizer(buffer) {
-  try {
-    if (tokenizer != null) {
-      tokenizer.delete();
+function loadTokenizer(buffer) {
+  for (const tokenizer of ["HFTokenizer", "Tiktoken", "SPTokenizer", "Llama2cTokenizer"]) {
+    let t = null;
+    try {
+      t = new tk[tokenizer]();
+      t.load(buffer);
+      console.log("Loaded " + tokenizer);
+      return t;
+    } catch (e) {
+      t.delete();
     }
-    tokenizer = new tk.SPTokenizer();
-    tokenizer.load(buffer);
-  } catch (e) {
+  }
+
+  return null;
+}
+
+function verifyTokenizer(buffer) {
+  if (tokenizer != null) {
+    tokenizer.delete();
+    tokenizer = null;
+  }
+
+  tokenizer = loadTokenizer(buffer);
+
+  if (tokenizer == null) {
     tokenizerText.textContent = "Failed to load tokenizer: " + e;
-    tokenizerText.style.color = "red";
-    return false;
-  }
-
-  if (tokenizer.bosTok != modelBos) {
-    tokenizerText.textContent = "BOS token mismatch: " + tokenizer.bosTok + " != " + modelBos;
-    tokenizerText.style.color = "red";
-    return false;
-  }
-
-  if (tokenizer.eosTok != modelEos) {
-    tokenizerText.textContent = "EOS token mismatch: " + tokenizer.eosTok + " != " + modelEos
     tokenizerText.style.color = "red";
     return false;
   }
@@ -393,9 +405,14 @@ function loadTokenizerFile(file) {
   reader.onload = function(event) {
     const buffer = event.target.result;
 
+    tokenizerWarningText.textContent = "";
     if (verifyTokenizer(buffer)) {
       tokenizerText.textContent = 'Uploaded tokenizer: ' + file.name;
       tokenizerText.style.color = null;
+
+      if (tokenizer.vocabSize != modelVocabSize) {
+        tokenizerWarningText.textContent = "Warning: Vocab size mismatch: " + tokenizer.vocabSize + " != " + modelVocabSize;
+      }
 
       if (module != null) {
         inferenceButton.disabled = false;
